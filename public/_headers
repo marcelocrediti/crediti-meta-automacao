@@ -1,3 +1,5 @@
 /*
-  Content-Security-Policy: frame-src 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://graph.instagram.com; frame-src 'none'; object-src 'none'; base-uri 'self'
   X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Cache-Control: no-cache
