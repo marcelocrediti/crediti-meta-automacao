@@ -1,0 +1,14 @@
+{
+  "name": "crediti-meta-automacao",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "echo build"
+  },
+  "dependencies": {
+    "@netlify/functions": "latest"
+  },
+  "devDependencies": {
+    "typescript": "latest"
+  }
+}
