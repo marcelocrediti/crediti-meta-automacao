@@ -58,7 +58,7 @@ async function sendPrivateReply(commentId: string) {
     throw new Error("META_ACCESS_TOKEN não configurado");
   }
 
-  const endpoint = `${graphBaseUrl}/${graphVersion}/${encodeURIComponent(commentId)}/private_replies`;
+  const endpoint = `${graphBaseUrl}/${graphVersion}/me/messages`;
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -66,10 +66,13 @@ async function sendPrivateReply(commentId: string) {
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      message:
-        "Seu Desafio dos R$ 5 Mil chegou! 💛\n\n" +
-        "A constância vale mais que a perfeição. Baixe o PDF e comece hoje:\n" +
-        `${pdfUrl}\n\n@crediti.oficial`,
+      recipient: { comment_id: commentId },
+      message: {
+        text:
+          "Seu Desafio dos R$ 5 Mil chegou! 💛\n\n" +
+          "A constância vale mais que a perfeição. Baixe o PDF e comece hoje:\n" +
+          `${pdfUrl}\n\n@crediti.oficial`,
+      },
     }),
   });
 
