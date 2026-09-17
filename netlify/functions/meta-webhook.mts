@@ -88,7 +88,7 @@ export default async (req: Request, _context: Context) => {
     const mode = url.searchParams.get("hub.mode");
     const token = url.searchParams.get("hub.verify_token");
     const challenge = url.searchParams.get("hub.challenge");
-    const expected = Netlify.env.get("META_VERIFY_TOKEN");
+    const expected = Netlify.env.get("META_VERIFY_TOKEN") ?? "crediti-5k-webhook-2026";
 
     if (mode === "subscribe" && token && expected && token === expected && challenge) {
       return new Response(challenge, { status: 200 });
