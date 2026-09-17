@@ -19,7 +19,27 @@ function getCampaignStore() {
     : getDeployStore("crediti-automation");
 }
 
+async function ensureSeedCampaign() {
+  const store = getCampaignStore();
+  const { blobs } = await store.list({ prefix: "campaigns/" });
+  if (blobs.length > 0) return;
+
+  const now = new Date().toISOString();
+  const campaign: Campaign = {
+    id: "desafio-5k",
+    name: "Desafio 5K",
+    keywords: ["5K", "5 K", "5MIL", "5 MIL", "CINCO MIL"],
+    message: "Seu Desafio dos R$ 5 Mil chegou! 💛\n\nA constância vale mais que a perfeição. Baixe o PDF e comece hoje:",
+    url: "https://crediti-automacao.netlify.app/DESAFIO_DOS_R_5_MIL_CREDITI.pdf",
+    active: true,
+    createdAt: now,
+    updatedAt: now,
+  };
+  await store.setJSON(`campaigns/${campaign.id}`, campaign);
+}
+
 async function listCampaigns() {
+  await ensureSeedCampaign();
   const store = getCampaignStore();
   const { blobs } = await store.list({ prefix: "campaigns/" });
   const items = await Promise.all(
