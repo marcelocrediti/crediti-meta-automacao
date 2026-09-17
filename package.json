@@ -3,11 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "start": "node server.mjs",
     "build": "echo build"
   },
   "dependencies": {
     "@netlify/functions": "latest",
-    "@netlify/blobs": "latest"
+    "@netlify/blobs": "latest",
+    "express": "latest",
+    "multer": "latest"
   },
   "devDependencies": {
     "typescript": "latest"
