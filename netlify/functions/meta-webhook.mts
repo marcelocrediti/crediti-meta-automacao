@@ -1,19 +1,16 @@
 import type { Context } from "@netlify/functions";
+import { getDeployStore, getStore } from "@netlify/blobs";
 
-function normalizeText(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function matchesFiveK(value: string) {
-  const text = normalizeText(value);
-  const accepted = ["5k", "5 k", "5mil", "5 mil", "cinco mil"];
-  return accepted.some((item) => text === item || text.includes(item));
-}
+type Campaign = {
+  id: string;
+  name: string;
+  keywords: string[];
+  message: string;
+  url?: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
 
 type MetaCommentChange = {
   field?: string;
@@ -29,34 +26,49 @@ type MetaWebhookPayload = {
   }>;
 };
 
-function getMatchingComments(payload: MetaWebhookPayload) {
-  const matches: Array<{ commentId: string; text: string }> = [];
-
-  for (const entry of payload.entry ?? []) {
-    for (const change of entry.changes ?? []) {
-      const commentId = change.value?.id;
-      const text = change.value?.text ?? "";
-
-      if (change.field === "comments" && commentId && matchesFiveK(text)) {
-        matches.push({ commentId, text });
-      }
-    }
-  }
-
-  return matches;
+function getCampaignStore() {
+  const production = Netlify.context?.deploy?.context === "production";
+  return production
+    ? getStore("crediti-automation", { consistency: "strong" })
+    : getDeployStore("crediti-automation");
 }
 
-async function sendPrivateReply(commentId: string) {
+function normalizeText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+async function getActiveCampaigns() {
+  const store = getCampaignStore();
+  const { blobs } = await store.list({ prefix: "campaigns/" });
+  const campaigns = await Promise.all(
+    blobs.map(({ key }) => store.get(key, { type: "json" }) as Promise<Campaign | null>),
+  );
+  return campaigns.filter((campaign): campaign is Campaign => Boolean(campaign?.active));
+}
+
+function campaignMatches(campaign: Campaign, comment: string) {
+  const text = normalizeText(comment);
+  return campaign.keywords.some((keyword) => {
+    const normalizedKeyword = normalizeText(keyword);
+    return normalizedKeyword && (text === normalizedKeyword || text.includes(normalizedKeyword));
+  });
+}
+
+async function sendPrivateReply(commentId: string, campaign: Campaign) {
   const accessToken = Netlify.env.get("META_ACCESS_TOKEN");
   const graphBaseUrl = Netlify.env.get("META_GRAPH_BASE_URL") ?? "https://graph.instagram.com";
   const graphVersion = Netlify.env.get("META_GRAPH_API_VERSION") ?? "v24.0";
-  const pdfUrl =
-    Netlify.env.get("META_5K_PDF_URL") ??
-    "https://crediti-automacao.netlify.app/DESAFIO_DOS_R_5_MIL_CREDITI.pdf";
 
-  if (!accessToken) {
-    throw new Error("META_ACCESS_TOKEN não configurado");
-  }
+  if (!accessToken) throw new Error("META_ACCESS_TOKEN não configurado");
+
+  const text = campaign.url
+    ? `${campaign.message}\n\n${campaign.url}`
+    : campaign.message;
 
   const endpoint = `${graphBaseUrl}/${graphVersion}/me/messages`;
   const response = await fetch(endpoint, {
@@ -67,12 +79,7 @@ async function sendPrivateReply(commentId: string) {
     },
     body: JSON.stringify({
       recipient: { comment_id: commentId },
-      message: {
-        text:
-          "Seu Desafio dos R$ 5 Mil chegou! 💛\n\n" +
-          "A constância vale mais que a perfeição. Baixe o PDF e comece hoje:\n" +
-          `${pdfUrl}\n\n@crediti.oficial`,
-      },
+      message: { text },
     }),
   });
 
@@ -112,15 +119,23 @@ export default async (req: Request, _context: Context) => {
   }
 
   console.log("META_WEBHOOK_EVENT", JSON.stringify(payload));
+  const campaigns = await getActiveCampaigns();
 
-  const comments = getMatchingComments(payload);
+  for (const entry of payload.entry ?? []) {
+    for (const change of entry.changes ?? []) {
+      const commentId = change.value?.id;
+      const commentText = change.value?.text ?? "";
+      if (change.field !== "comments" || !commentId || !commentText) continue;
 
-  for (const comment of comments) {
-    try {
-      const result = await sendPrivateReply(comment.commentId);
-      console.log("CREDITI_5K_PRIVATE_REPLY_SENT", result);
-    } catch (error) {
-      console.error("CREDITI_5K_PRIVATE_REPLY_FAILED", error);
+      const campaign = campaigns.find((item) => campaignMatches(item, commentText));
+      if (!campaign) continue;
+
+      try {
+        const result = await sendPrivateReply(commentId, campaign);
+        console.log("CREDITI_AUTOMATION_SENT", campaign.id, result);
+      } catch (error) {
+        console.error("CREDITI_AUTOMATION_FAILED", campaign.id, error);
+      }
     }
   }
 
