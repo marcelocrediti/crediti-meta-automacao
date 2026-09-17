@@ -6,7 +6,8 @@
     "build": "echo build"
   },
   "dependencies": {
-    "@netlify/functions": "latest"
+    "@netlify/functions": "latest",
+    "@netlify/blobs": "latest"
   },
   "devDependencies": {
     "typescript": "latest"
