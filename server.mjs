@@ -100,7 +100,9 @@ async function receiveWebhook(req, res) {
       const accessToken = process.env.META_ACCESS_TOKEN; if (!accessToken) throw new Error('META_ACCESS_TOKEN não configurado');
       const graphBaseUrl = process.env.META_GRAPH_BASE_URL || 'https://graph.instagram.com'; const graphVersion = process.env.META_GRAPH_API_VERSION || 'v24.0';
       const campaignUrl = absoluteUrl(req, campaign.url || ''); const messageText = campaignUrl ? `${campaign.message}\n\n${campaignUrl}` : campaign.message;
-      const response = await fetch(`${graphBaseUrl}/${graphVersion}/me/messages`, { method:'POST', headers:{ authorization:`Bearer ${accessToken}`, 'content-type':'application/json' }, body:JSON.stringify({recipient:{comment_id:commentId},message:{text:messageText}}) });
+      const messageEndpoint = new URL(`${graphBaseUrl}/${graphVersion}/me/messages`);
+      messageEndpoint.searchParams.set('access_token', accessToken);
+      const response = await fetch(messageEndpoint, { method:'POST', headers:{ 'content-type':'application/json' }, body:JSON.stringify({recipient:{comment_id:commentId},message:{text:messageText}}) });
       if (!response.ok) console.error('META_SEND_FAILED', response.status, await response.text());
     } catch (error) { console.error('META_AUTOMATION_FAILED', error); }
   }
