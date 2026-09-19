@@ -63,7 +63,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(UPLOAD_DIR, { maxAge: '1h' }));
 app.use(express.static(PUBLIC_DIR, { etag: false, lastModified: false, setHeaders(res) { res.setHeader('Cache-Control', 'no-store, max-age=0'); } }));
 
-app.get('/health', (_req, res) => res.json({ ok: true, service: 'Automação Crediti' }));
+app.get('/health', (_req, res) => res.json({ ok: true, service: 'Automação Crediti', platform: 'Render' }));
+
+app.get('/meta-oauth-callback', (req, res) => {
+  const code = req.query.code;
+  const error = req.query.error;
+  const errorDescription = req.query.error_description;
+  if (error) return res.status(400).send(`Falha na autorização da Meta: ${errorDescription || error}`);
+  if (!code) return res.status(200).send('Callback da Crediti ativo no Render. Nenhum código de autorização recebido.');
+  return res.status(200).send('Autorização recebida com sucesso. Pode voltar para a configuração da Crediti.');
+});
 
 app.get('/.netlify/functions/campaigns', (_req, res) => {
   const campaigns = readCampaigns().sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')));
@@ -120,16 +129,16 @@ app.post('/.netlify/functions/campaign-file', upload.single('file'), (req, res) 
   res.json({ success: true, url, name: req.file.originalname });
 });
 
-app.get('/.netlify/functions/meta-webhook', (req, res) => {
+function verifyWebhook(req, res) {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
   const challenge = req.query['hub.challenge'];
   const expected = process.env.META_VERIFY_TOKEN || 'crediti-5k-webhook-2026';
   if (mode === 'subscribe' && token === expected && challenge) return res.status(200).send(String(challenge));
-  res.status(200).send('Webhook da Crediti ativo');
-});
+  return res.status(200).send('Webhook da Crediti ativo no Render');
+}
 
-app.post('/.netlify/functions/meta-webhook', async (req, res) => {
+async function receiveWebhook(req, res) {
   res.status(200).send('EVENT_RECEIVED');
   const payload = req.body || {};
   const campaigns = readCampaigns().filter(c => c.active);
@@ -162,7 +171,12 @@ app.post('/.netlify/functions/meta-webhook', async (req, res) => {
       }
     }
   }
-});
+}
+
+app.get('/meta-webhook', verifyWebhook);
+app.post('/meta-webhook', receiveWebhook);
+app.get('/.netlify/functions/meta-webhook', verifyWebhook);
+app.post('/.netlify/functions/meta-webhook', receiveWebhook);
 
 app.use((_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'index.html')));
 
