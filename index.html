@@ -241,7 +241,12 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
           <p>Defina para onde a pessoa deve ir depois de tocar no anúncio.</p>
           <div class="field"><label>Tipo de destino</label><select id="boostDestinationType"><option>Google Play</option><option>App Store</option><option>WhatsApp</option><option>Site Crediti</option><option>Instagram</option><option>Link personalizado</option></select></div>
 <div class="field"><label>Aplicativo</label><input id="boostAppName" type="text" value="meucrediti" placeholder="Ex.: meucrediti"></div>
+          <div class="boostgrid">
+            <div class="field"><label>Origem da campanha</label><select id="boostSource"><option value="instagram_ads">Instagram Ads</option><option value="facebook_ads">Facebook Ads</option><option value="google_ads">Google Ads</option><option value="youtube_ads">YouTube Ads</option></select></div>
+            <div class="field"><label>Código de rastreamento</label><input id="boostTrackingId" type="text" readonly></div>
+          </div>
           <div class="field"><label>Link ou destino</label><input id="boostDestination" type="url" placeholder="Cole o link final da campanha"></div>
+          <div class="field"><label>Link rastreado final</label><textarea id="boostTrackedUrl" readonly placeholder="O link rastreado será montado automaticamente"></textarea></div>
         </div>
 
         <div class="boostcard">
@@ -281,7 +286,7 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
           <h3>Revisão do impulsionamento</h3>
           <div class="summaryrow"><span>Conteúdo</span><b id="sumPost">Não informado</b></div>
           <div class="summaryrow"><span>Objetivo</span><b id="sumObjective">Baixar aplicativo</b></div>
-          <div class="summaryrow"><span>Destino</span><b id="sumDestination">Não informado</b></div>
+          <div class="summaryrow"><span>Destino</span><b id="sumDestination">Não informado</b></div><div class="summaryrow"><span>Rastreamento</span><b id="sumTracking">—</b></div>
           <div class="summaryrow"><span>Público</span><b id="sumAudience">Itapajé + região • 18 a 65 anos</b></div>
           <div class="summaryrow"><span>Orçamento</span><b id="sumBudget">R$ 50,00 total</b></div>
           <div class="summaryrow"><span>Duração</span><b id="sumDays">5 dias</b></div>
@@ -432,18 +437,55 @@ $('menuBtn').onclick=()=> $('drawer').classList.add('open');$('shade').onclick=(
 $('refreshBtn').onclick=load;$('pdfBtn').onclick=pdf;$('monthSelect').onchange=load;
 
 let boostObjective='Baixar aplicativo';
+function makeTrackingId(){
+  const d=new Date();const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
+  return 'ci-'+y+m+day+'-'+Math.random().toString(36).slice(2,8);
+}
+function slugCampaign(v){return String(v||'campanha-crediti').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80)||'campanha-crediti'}
+function ensureTrackingId(){if($('boostTrackingId')&&!$('boostTrackingId').value)$('boostTrackingId').value=makeTrackingId()}
+function buildTrackedUrl(){
+  ensureTrackingId();
+  const type=$('boostDestinationType')?.value||'';
+  const source=$('boostSource')?.value||'instagram_ads';
+  const campaign=slugCampaign($('boostName')?.value);
+  const id=$('boostTrackingId')?.value||makeTrackingId();
+  const ref='utm_source='+encodeURIComponent(source)+'&utm_medium=paid_social&utm_campaign='+encodeURIComponent(campaign)+'&campaign_id='+encodeURIComponent(id);
+  let base=$('boostDestination')?.value?.trim()||'';
+  if(type==='Google Play'){
+    const app=($('boostAppName')?.value||'').trim().toLowerCase();
+    if(app==='meucrediti'||!base)base='https://play.google.com/store/apps/details?id=br.com.creditisolucoes.meucrediti';
+    const u=new URL(base);
+    if(!u.searchParams.get('id')&&app==='meucrediti')u.searchParams.set('id','br.com.creditisolucoes.meucrediti');
+    u.searchParams.set('referrer',ref);
+    return u.toString();
+  }
+  if(base){
+    try{
+      const u=new URL(base);
+      u.searchParams.set('utm_source',source);
+      u.searchParams.set('utm_medium','paid_social');
+      u.searchParams.set('utm_campaign',campaign);
+      u.searchParams.set('campaign_id',id);
+      return u.toString();
+    }catch{}
+  }
+  return '';
+}
 function boostMoney(v){return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(v)||0)}
 function updateBoostSummary(){
   const post=$('boostPostUrl')?.value?.trim();
   const dest=$('boostDestination')?.value?.trim();
   const appName=$('boostAppName')?.value?.trim()||'Aplicativo';
+  const tracked=buildTrackedUrl();
+  if($('boostTrackedUrl'))$('boostTrackedUrl').value=tracked;
   const region=$('boostRegion')?.value||'';
   const min=$('boostAgeMin')?.value||18, max=$('boostAgeMax')?.value||65;
   const budget=Number($('boostBudget')?.value||0), type=$('boostBudgetType')?.value||'total';
   const days=Number($('boostDays')?.value||0);
   if($('sumPost'))$('sumPost').textContent=post?post.replace(/^https?:\/\/(www\.)?/,'').slice(0,42):'Não informado';
   if($('sumObjective'))$('sumObjective').textContent=boostObjective;
-  if($('sumDestination'))$('sumDestination').textContent=dest?(appName+' • '+$('boostDestinationType').value):'Não informado';
+  if($('sumDestination'))$('sumDestination').textContent=(dest||tracked)?(appName+' • '+$('boostDestinationType').value):'Não informado';
+  if($('sumTracking'))$('sumTracking').textContent=($('boostSource')?.selectedOptions?.[0]?.textContent||'Instagram Ads')+' • '+($('boostTrackingId')?.value||'—');
   if($('sumAudience'))$('sumAudience').textContent=region+' • '+min+' a '+max+' anos';
   if($('sumBudget'))$('sumBudget').textContent=boostMoney(type==='daily'?budget*days:budget)+(type==='daily'?' estimado ('+boostMoney(budget)+'/dia)':' total');
   if($('sumDays'))$('sumDays').textContent=days+' '+(days===1?'dia':'dias');
@@ -455,6 +497,9 @@ function boostDraft(){
     objective:boostObjective,
     destinationType:$('boostDestinationType').value,
     appName:$('boostAppName').value.trim(),
+    source:$('boostSource').value,
+    trackingId:$('boostTrackingId').value,
+    trackedUrl:$('boostTrackedUrl').value,
     destination:$('boostDestination').value.trim(),
     region:$('boostRegion').value,
     cities:$('boostCities').value.trim(),
@@ -471,8 +516,9 @@ function boostDraft(){
 function loadBoostDraft(){
   try{
     const d=JSON.parse(localStorage.getItem('creditiBoostDraft')||'null'); if(!d)return;
-    ['postUrl','name','appName','destination','cities','ageMin','ageMax','budget','days'].forEach(k=>{const id='boost'+k[0].toUpperCase()+k.slice(1);if($(id)&&d[k]!==undefined)$(id).value=d[k]});
+    ['postUrl','name','appName','trackingId','destination','cities','ageMin','ageMax','budget','days'].forEach(k=>{const id='boost'+k[0].toUpperCase()+k.slice(1);if($(id)&&d[k]!==undefined)$(id).value=d[k]});
     if(d.destinationType&&$('boostDestinationType'))$('boostDestinationType').value=d.destinationType;
+    if(d.source&&$('boostSource'))$('boostSource').value=d.source;
     if(d.region&&$('boostRegion'))$('boostRegion').value=d.region;
     if(d.budgetType&&$('boostBudgetType'))$('boostBudgetType').value=d.budgetType;
     if(d.start&&$('boostStart'))$('boostStart').value=d.start;
@@ -481,12 +527,12 @@ function loadBoostDraft(){
   updateBoostSummary();
 }
 document.querySelectorAll('#boostObjectives .choice').forEach(el=>el.addEventListener('click',()=>{document.querySelectorAll('#boostObjectives .choice').forEach(x=>x.classList.remove('active'));el.classList.add('active');boostObjective=el.dataset.value;updateBoostSummary()}));
-['boostPostUrl','boostName','boostDestinationType','boostAppName','boostDestination','boostRegion','boostCities','boostAgeMin','boostAgeMax','boostBudget','boostBudgetType','boostDays','boostStart'].forEach(id=>$(id)?.addEventListener('input',updateBoostSummary));
+['boostPostUrl','boostName','boostDestinationType','boostAppName','boostSource','boostDestination','boostRegion','boostCities','boostAgeMin','boostAgeMax','boostBudget','boostBudgetType','boostDays','boostStart'].forEach(id=>$(id)?.addEventListener('input',updateBoostSummary));
 $('saveBoostDraft')?.addEventListener('click',()=>{localStorage.setItem('creditiBoostDraft',JSON.stringify(boostDraft()));const b=$('saveBoostDraft');const old=b.textContent;b.textContent='Rascunho salvo ✓';setTimeout(()=>b.textContent=old,1500)});
 $('continueMetaBtn')?.addEventListener('click',()=>{localStorage.setItem('creditiBoostDraft',JSON.stringify(boostDraft()));window.open('https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=1754387845224500','_blank')});
 $('managePaymentBtn')?.addEventListener('click',()=>window.open('https://business.facebook.com/billing_hub','_blank'));
 document.querySelectorAll('[data-boost-link]').forEach(a=>a.addEventListener('click',()=>setTimeout(()=>document.getElementById('turbinar')?.scrollIntoView({behavior:'smooth',block:'start'}),80)));
-loadBoostDraft();
+ensureTrackingId();loadBoostDraft();
 
 fillMonths();load();setInterval(load,60000);
 </script>
