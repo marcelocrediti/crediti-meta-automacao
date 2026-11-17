@@ -98,6 +98,32 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
 @media(max-width:850px){.kpis{grid-template-columns:repeat(2,1fr)}.platforms{grid-template-columns:1fr}.funnel{grid-template-columns:repeat(3,1fr)}.sourcegrid{grid-template-columns:1fr}}
 @media(max-width:560px){.topbar{padding:14px}.iconbtn,.avatar{width:48px;height:48px}.brandhead strong{font-size:17px}.brandhead small{font-size:12px}main{padding:30px 16px 60px}.hero{padding:25px 22px;border-radius:25px}.controls{align-items:stretch}.selectwrap{flex:1}.selectwrap select{width:100%;min-width:0}.pdfbtn{justify-content:center}.kpis{grid-template-columns:1fr 1fr;gap:10px}.kpi{padding:16px}.kpi .value{font-size:25px}.pmetrics{grid-template-columns:1fr 1fr}.funnel{grid-template-columns:1fr 1fr}.sectionhead h2{font-size:25px}.sourcegrid{grid-template-columns:1fr}}
 @media print{.topbar,.controls,.drawer{display:none}body{background:white}.shell{max-width:none}main{padding:20px}.panel,.platform,.kpi{box-shadow:none}}
+
+.boostcard{background:white;border:1px solid var(--line);border-radius:26px;padding:22px;box-shadow:0 5px 20px rgba(20,32,25,.04);margin-bottom:16px}
+.boostgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.boostcard h3{font:700 18px Poppins;margin:0 0 6px}
+.boostcard p{color:var(--muted);font-size:13px;line-height:1.5;margin:0 0 16px}
+.field{display:flex;flex-direction:column;gap:7px;margin:12px 0}
+.field label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#6C7A71}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:15px;padding:13px 14px;background:#FBFCFB;color:var(--ink);font:500 14px Montserrat}
+.field textarea{min-height:84px;resize:vertical}
+.choicegrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.choice{border:1px solid var(--line);border-radius:16px;padding:13px;background:#FAFBFA;cursor:pointer;transition:.15s}
+.choice.active{border-color:#D7B000;background:#FFF8D0;box-shadow:inset 0 0 0 1px #D7B000}
+.choice b{display:block;font-size:13px}.choice span{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.boostsummary{background:#121A15;color:white;border-radius:24px;padding:22px}
+.boostsummary h3{font:700 20px Poppins;margin:0 0 15px}
+.summaryrow{display:flex;justify-content:space-between;gap:18px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:13px}
+.summaryrow:last-child{border-bottom:0}.summaryrow span{color:#AAB7AF}.summaryrow b{text-align:right}
+.boostactions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.primarybtn,.ghostbtn{border:0;border-radius:16px;padding:14px 18px;font-weight:800;cursor:pointer}
+.primarybtn{background:var(--yellow);color:var(--ink)}.ghostbtn{background:#EEF2EF;color:var(--ink)}
+.paybox{display:flex;align-items:center;gap:12px;background:#F7F9F7;border-radius:16px;padding:14px}
+.paybox .ok{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#DCECDF;color:var(--green);font-weight:800}
+.paybox b{display:block;font-size:13px}.paybox span{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.boostnotice{background:#FFF8D0;border:1px solid #EBD56A;border-radius:17px;padding:14px 16px;font-size:12px;line-height:1.55;color:#66530A;margin-top:12px}
+#boostSection{scroll-margin-top:90px}
+@media(max-width:700px){.boostgrid{grid-template-columns:1fr}.choicegrid{grid-template-columns:1fr}.boostactions>*{flex:1}}
 </style>
 </head>
 <body>
@@ -184,11 +210,96 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
       <div class="sourceitem"><strong>Atribuição de origem</strong><span>Não atribuiremos um cliente a Instagram, Facebook, Google ou YouTube sem evidência verificada por UTM, Play Referrer ou deep link.</span></div>
     </div>
   </section>
+
+  <section class="section" id="turbinar">
+    <div class="sectionhead"><div><div class="eyebrow">Meta Ads</div><h2>Turbinar conteúdo</h2><p>Monte o impulsionamento no próprio Painel Crediti e revise tudo antes de seguir para a Meta.</p></div></div>
+
+    <div class="boostgrid" id="boostSection">
+      <div>
+        <div class="boostcard">
+          <h3>1. Conteúdo do Instagram</h3>
+          <p>Cole o link do Reels ou publicação que deseja promover. Depois vamos evoluir para listar os conteúdos automaticamente.</p>
+          <div class="field"><label>Link do Reels ou post</label><input id="boostPostUrl" type="url" placeholder="https://www.instagram.com/reel/..." inputmode="url"></div>
+          <div class="field"><label>Nome interno da campanha</label><input id="boostName" type="text" placeholder="Ex.: Reels apresentação meucrediti"></div>
+        </div>
+
+        <div class="boostcard">
+          <h3>2. Objetivo</h3>
+          <p>Escolha o resultado principal que você quer buscar.</p>
+          <div class="choicegrid" id="boostObjectives">
+            <div class="choice active" data-value="Instalações do meucrediti"><b>Instalações do meucrediti</b><span>Levar pessoas para baixar o app</span></div>
+            <div class="choice" data-value="WhatsApp"><b>WhatsApp</b><span>Gerar conversas com a Crediti</span></div>
+            <div class="choice" data-value="Visitas ao site"><b>Visitas ao site</b><span>Levar tráfego para uma página</span></div>
+            <div class="choice" data-value="Engajamento"><b>Engajamento</b><span>Aumentar interação com o conteúdo</span></div>
+            <div class="choice" data-value="Mensagens no Instagram"><b>Mensagens no Instagram</b><span>Gerar conversas por direct</span></div>
+            <div class="choice" data-value="Visitas ao perfil"><b>Visitas ao perfil</b><span>Aumentar descoberta do perfil</span></div>
+          </div>
+        </div>
+
+        <div class="boostcard">
+          <h3>3. Destino</h3>
+          <p>Defina para onde a pessoa deve ir depois de tocar no anúncio.</p>
+          <div class="field"><label>Tipo de destino</label><select id="boostDestinationType"><option>Google Play / meucrediti</option><option>WhatsApp</option><option>Site Crediti</option><option>Instagram</option><option>Link personalizado</option></select></div>
+          <div class="field"><label>Link ou destino</label><input id="boostDestination" type="url" placeholder="Cole o link final da campanha"></div>
+        </div>
+
+        <div class="boostcard">
+          <h3>4. Público</h3>
+          <p>Monte uma segmentação simples sem precisar entrar no Gerenciador de Anúncios.</p>
+          <div class="field"><label>Região</label><select id="boostRegion"><option>Itapajé + região</option><option>Ceará</option><option>Brasil</option><option>Personalizada</option></select></div>
+          <div class="field"><label>Cidades ou observação do público</label><textarea id="boostCities" placeholder="Ex.: Itapajé, Irauçuba, Tejuçuoca, Umirim e Uruburetama"></textarea></div>
+          <div class="boostgrid">
+            <div class="field"><label>Idade mínima</label><input id="boostAgeMin" type="number" min="18" max="65" value="18"></div>
+            <div class="field"><label>Idade máxima</label><input id="boostAgeMax" type="number" min="18" max="65" value="65"></div>
+          </div>
+        </div>
+
+        <div class="boostcard">
+          <h3>5. Orçamento e duração</h3>
+          <p>Controle o valor antes de publicar.</p>
+          <div class="boostgrid">
+            <div class="field"><label>Orçamento</label><input id="boostBudget" type="number" min="5" step="1" value="50"></div>
+            <div class="field"><label>Tipo</label><select id="boostBudgetType"><option value="total">Total da campanha</option><option value="daily">Por dia</option></select></div>
+          </div>
+          <div class="boostgrid">
+            <div class="field"><label>Duração em dias</label><input id="boostDays" type="number" min="1" max="30" value="5"></div>
+            <div class="field"><label>Início</label><select id="boostStart"><option>Assim que aprovado</option><option>Amanhã</option></select></div>
+          </div>
+        </div>
+
+        <div class="boostcard">
+          <h3>6. Pagamento</h3>
+          <div class="paybox"><div class="ok">✓</div><div><b>Conta Meta Ads conectada</b><span>Conta 1754387845224500 • cobrança continua sendo feita pela Meta</span></div></div>
+          <div class="boostnotice">O Painel Crediti não armazena número de cartão, CVV ou dados bancários. A forma de pagamento permanece administrada pela Meta.</div>
+          <div class="boostactions"><button class="ghostbtn" id="managePaymentBtn">Gerenciar pagamento na Meta</button></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="boostsummary">
+          <h3>Revisão do impulsionamento</h3>
+          <div class="summaryrow"><span>Conteúdo</span><b id="sumPost">Não informado</b></div>
+          <div class="summaryrow"><span>Objetivo</span><b id="sumObjective">Instalações do meucrediti</b></div>
+          <div class="summaryrow"><span>Destino</span><b id="sumDestination">Não informado</b></div>
+          <div class="summaryrow"><span>Público</span><b id="sumAudience">Itapajé + região • 18 a 65 anos</b></div>
+          <div class="summaryrow"><span>Orçamento</span><b id="sumBudget">R$ 50,00 total</b></div>
+          <div class="summaryrow"><span>Duração</span><b id="sumDays">5 dias</b></div>
+          <div class="summaryrow"><span>Pagamento</span><b>Meta Ads • configurado</b></div>
+          <div class="boostactions">
+            <button class="ghostbtn" id="saveBoostDraft">Salvar rascunho</button>
+            <button class="primarybtn" id="continueMetaBtn">Continuar na Meta</button>
+          </div>
+          <div class="boostnotice" style="margin-top:16px;background:#1D2A22;border-color:#35483C;color:#DCE7DF">Nesta primeira versão, o painel monta e salva todo o impulsionamento e abre a conta correta no Gerenciador de Anúncios para a publicação final. A criação automática será ligada somente com autenticação administrativa, para ninguém conseguir gastar verba sem autorização.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
 </main>
 <div class="footer">Crediti Soluções Financeiras • meucrediti • Painel privado de inteligência</div>
 </div>
 
-<div class="drawer" id="drawer"><div class="shade" id="shade"></div><nav class="menu"><div class="eyebrow">Painel Crediti</div><h3>Navegação</h3><a href="#resumo">Resumo</a><a href="#plataformas">Plataformas</a><a href="#evolucao">Evolução</a><a href="#funil">Jornada</a><a href="#produtos">Produtos</a><a href="#dias">Produção por dia</a><a href="#qualidade">Fontes e atribuição</a></nav></div>
+<div class="drawer" id="drawer"><div class="shade" id="shade"></div><nav class="menu"><div class="eyebrow">Painel Crediti</div><h3>Navegação</h3><a href="#resumo">Resumo</a><a href="#plataformas">Plataformas</a><a href="#evolucao">Evolução</a><a href="#funil">Jornada</a><a href="#produtos">Produtos</a><a href="#dias">Produção por dia</a><a href="#qualidade">Fontes e atribuição</a><a href="#turbinar" data-boost-link="1">Turbinar conteúdo</a></nav></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
@@ -318,6 +429,62 @@ function pdf(){
 
 $('menuBtn').onclick=()=> $('drawer').classList.add('open');$('shade').onclick=()=> $('drawer').classList.remove('open');document.querySelectorAll('.menu a').forEach(a=>a.onclick=()=> $('drawer').classList.remove('open'));
 $('refreshBtn').onclick=load;$('pdfBtn').onclick=pdf;$('monthSelect').onchange=load;
+
+let boostObjective='Instalações do meucrediti';
+function boostMoney(v){return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(v)||0)}
+function updateBoostSummary(){
+  const post=$('boostPostUrl')?.value?.trim();
+  const dest=$('boostDestination')?.value?.trim();
+  const region=$('boostRegion')?.value||'';
+  const min=$('boostAgeMin')?.value||18, max=$('boostAgeMax')?.value||65;
+  const budget=Number($('boostBudget')?.value||0), type=$('boostBudgetType')?.value||'total';
+  const days=Number($('boostDays')?.value||0);
+  if($('sumPost'))$('sumPost').textContent=post?post.replace(/^https?:\/\/(www\.)?/,'').slice(0,42):'Não informado';
+  if($('sumObjective'))$('sumObjective').textContent=boostObjective;
+  if($('sumDestination'))$('sumDestination').textContent=dest?dest.replace(/^https?:\/\/(www\.)?/,'').slice(0,38):'Não informado';
+  if($('sumAudience'))$('sumAudience').textContent=region+' • '+min+' a '+max+' anos';
+  if($('sumBudget'))$('sumBudget').textContent=boostMoney(type==='daily'?budget*days:budget)+(type==='daily'?' estimado ('+boostMoney(budget)+'/dia)':' total');
+  if($('sumDays'))$('sumDays').textContent=days+' '+(days===1?'dia':'dias');
+}
+function boostDraft(){
+  return {
+    postUrl:$('boostPostUrl').value.trim(),
+    name:$('boostName').value.trim(),
+    objective:boostObjective,
+    destinationType:$('boostDestinationType').value,
+    destination:$('boostDestination').value.trim(),
+    region:$('boostRegion').value,
+    cities:$('boostCities').value.trim(),
+    ageMin:Number($('boostAgeMin').value||18),
+    ageMax:Number($('boostAgeMax').value||65),
+    budget:Number($('boostBudget').value||0),
+    budgetType:$('boostBudgetType').value,
+    days:Number($('boostDays').value||1),
+    start:$('boostStart').value,
+    adAccount:'1754387845224500',
+    savedAt:new Date().toISOString()
+  };
+}
+function loadBoostDraft(){
+  try{
+    const d=JSON.parse(localStorage.getItem('creditiBoostDraft')||'null'); if(!d)return;
+    ['postUrl','name','destination','cities','ageMin','ageMax','budget','days'].forEach(k=>{const id='boost'+k[0].toUpperCase()+k.slice(1);if($(id)&&d[k]!==undefined)$(id).value=d[k]});
+    if(d.destinationType&&$('boostDestinationType'))$('boostDestinationType').value=d.destinationType;
+    if(d.region&&$('boostRegion'))$('boostRegion').value=d.region;
+    if(d.budgetType&&$('boostBudgetType'))$('boostBudgetType').value=d.budgetType;
+    if(d.start&&$('boostStart'))$('boostStart').value=d.start;
+    if(d.objective){boostObjective=d.objective;document.querySelectorAll('#boostObjectives .choice').forEach(el=>el.classList.toggle('active',el.dataset.value===d.objective))}
+  }catch(e){}
+  updateBoostSummary();
+}
+document.querySelectorAll('#boostObjectives .choice').forEach(el=>el.addEventListener('click',()=>{document.querySelectorAll('#boostObjectives .choice').forEach(x=>x.classList.remove('active'));el.classList.add('active');boostObjective=el.dataset.value;updateBoostSummary()}));
+['boostPostUrl','boostName','boostDestinationType','boostDestination','boostRegion','boostCities','boostAgeMin','boostAgeMax','boostBudget','boostBudgetType','boostDays','boostStart'].forEach(id=>$(id)?.addEventListener('input',updateBoostSummary));
+$('saveBoostDraft')?.addEventListener('click',()=>{localStorage.setItem('creditiBoostDraft',JSON.stringify(boostDraft()));const b=$('saveBoostDraft');const old=b.textContent;b.textContent='Rascunho salvo ✓';setTimeout(()=>b.textContent=old,1500)});
+$('continueMetaBtn')?.addEventListener('click',()=>{localStorage.setItem('creditiBoostDraft',JSON.stringify(boostDraft()));window.open('https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=1754387845224500','_blank')});
+$('managePaymentBtn')?.addEventListener('click',()=>window.open('https://business.facebook.com/billing_hub','_blank'));
+document.querySelectorAll('[data-boost-link]').forEach(a=>a.addEventListener('click',()=>setTimeout(()=>document.getElementById('turbinar')?.scrollIntoView({behavior:'smooth',block:'start'}),80)));
+loadBoostDraft();
+
 fillMonths();load();setInterval(load,60000);
 </script>
 </body>
