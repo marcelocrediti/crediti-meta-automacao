@@ -155,7 +155,7 @@ if ($appText===false) failx('app read failed',8);
 if (!str_contains($appText,'mc_attribution')) {
   copy($app,$app.'.pre-attribution-'.$stamp.'.bak');
 
-  $registerPattern = "/(if\\(\\$path==='\\/api\\/auth\\/register'&&\\$method==='POST'\\)\\{\\s*\\$b=\\$this->body\\(\\);)/";
+  $registerNeedle = "if(\$path==='/api/auth/register'&&\$method==='POST'){\n   \$b=\$this->body();";
   $attrCode = <<<'PHP'
 
    $attrRaw=is_array($b['attribution']??null)?$b['attribution']:[];
@@ -182,8 +182,9 @@ if (!str_contains($appText,'mc_attribution')) {
     }
    }
 PHP;
-  $new = preg_replace($registerPattern,'$1'.$attrCode,$appText,1,$count1);
-  if($new===null||$count1!==1) failx('register marker not found',9);
+  if(!str_contains($appText,$registerNeedle)) failx('register marker not found',9);
+  $new=str_replace($registerNeedle,$registerNeedle.$attrCode,$appText,$count1);
+  if($count1!==1) failx('register marker count invalid',9);
 
   $legalNeedle = "\$this->q('INSERT INTO mc_legal(user_id,version,accepted_at) VALUES(?,?,?)',[\$id,self::LEGAL,\$this->now()]);\$this->db->commit();";
   $legalReplace = "\$this->q('INSERT INTO mc_legal(user_id,version,accepted_at) VALUES(?,?,?)',[\$id,self::LEGAL,\$this->now()]);if(\$attr){\$this->q('INSERT IGNORE INTO mc_attribution(user_id,first_source,method,campaign_id,utm_source,utm_medium,utm_campaign,utm_content,landing_path,captured_at) VALUES(?,?,?,?,?,?,?,?,?,?)',[\$id,\$attr['source'],\$attr['method'],\$attr['campaignId']?:null,\$attr['utmSource']?:null,\$attr['utmMedium']?:null,\$attr['utmCampaign']?:null,\$attr['utmContent']?:null,\$attr['landingPath']?:null,\$this->now()]);}\$this->db->commit();";
