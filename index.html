@@ -227,7 +227,7 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
           <h3>2. Objetivo</h3>
           <p>Escolha o resultado principal que você quer buscar.</p>
           <div class="choicegrid" id="boostObjectives">
-            <div class="choice active" data-value="Instalações do meucrediti"><b>Instalações do meucrediti</b><span>Levar pessoas para baixar o app</span></div>
+            <div class="choice active" data-value="Baixar aplicativo"><b>Baixar aplicativo</b><span>Levar direto para Google Play ou App Store</span></div>
             <div class="choice" data-value="WhatsApp"><b>WhatsApp</b><span>Gerar conversas com a Crediti</span></div>
             <div class="choice" data-value="Visitas ao site"><b>Visitas ao site</b><span>Levar tráfego para uma página</span></div>
             <div class="choice" data-value="Engajamento"><b>Engajamento</b><span>Aumentar interação com o conteúdo</span></div>
@@ -239,7 +239,8 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
         <div class="boostcard">
           <h3>3. Destino</h3>
           <p>Defina para onde a pessoa deve ir depois de tocar no anúncio.</p>
-          <div class="field"><label>Tipo de destino</label><select id="boostDestinationType"><option>Google Play / meucrediti</option><option>WhatsApp</option><option>Site Crediti</option><option>Instagram</option><option>Link personalizado</option></select></div>
+          <div class="field"><label>Tipo de destino</label><select id="boostDestinationType"><option>Google Play</option><option>App Store</option><option>WhatsApp</option><option>Site Crediti</option><option>Instagram</option><option>Link personalizado</option></select></div>
+<div class="field"><label>Aplicativo</label><input id="boostAppName" type="text" value="meucrediti" placeholder="Ex.: meucrediti"></div>
           <div class="field"><label>Link ou destino</label><input id="boostDestination" type="url" placeholder="Cole o link final da campanha"></div>
         </div>
 
@@ -279,7 +280,7 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
         <div class="boostsummary">
           <h3>Revisão do impulsionamento</h3>
           <div class="summaryrow"><span>Conteúdo</span><b id="sumPost">Não informado</b></div>
-          <div class="summaryrow"><span>Objetivo</span><b id="sumObjective">Instalações do meucrediti</b></div>
+          <div class="summaryrow"><span>Objetivo</span><b id="sumObjective">Baixar aplicativo</b></div>
           <div class="summaryrow"><span>Destino</span><b id="sumDestination">Não informado</b></div>
           <div class="summaryrow"><span>Público</span><b id="sumAudience">Itapajé + região • 18 a 65 anos</b></div>
           <div class="summaryrow"><span>Orçamento</span><b id="sumBudget">R$ 50,00 total</b></div>
@@ -430,18 +431,19 @@ function pdf(){
 $('menuBtn').onclick=()=> $('drawer').classList.add('open');$('shade').onclick=()=> $('drawer').classList.remove('open');document.querySelectorAll('.menu a').forEach(a=>a.onclick=()=> $('drawer').classList.remove('open'));
 $('refreshBtn').onclick=load;$('pdfBtn').onclick=pdf;$('monthSelect').onchange=load;
 
-let boostObjective='Instalações do meucrediti';
+let boostObjective='Baixar aplicativo';
 function boostMoney(v){return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(v)||0)}
 function updateBoostSummary(){
   const post=$('boostPostUrl')?.value?.trim();
   const dest=$('boostDestination')?.value?.trim();
+  const appName=$('boostAppName')?.value?.trim()||'Aplicativo';
   const region=$('boostRegion')?.value||'';
   const min=$('boostAgeMin')?.value||18, max=$('boostAgeMax')?.value||65;
   const budget=Number($('boostBudget')?.value||0), type=$('boostBudgetType')?.value||'total';
   const days=Number($('boostDays')?.value||0);
   if($('sumPost'))$('sumPost').textContent=post?post.replace(/^https?:\/\/(www\.)?/,'').slice(0,42):'Não informado';
   if($('sumObjective'))$('sumObjective').textContent=boostObjective;
-  if($('sumDestination'))$('sumDestination').textContent=dest?dest.replace(/^https?:\/\/(www\.)?/,'').slice(0,38):'Não informado';
+  if($('sumDestination'))$('sumDestination').textContent=dest?(appName+' • '+$('boostDestinationType').value):'Não informado';
   if($('sumAudience'))$('sumAudience').textContent=region+' • '+min+' a '+max+' anos';
   if($('sumBudget'))$('sumBudget').textContent=boostMoney(type==='daily'?budget*days:budget)+(type==='daily'?' estimado ('+boostMoney(budget)+'/dia)':' total');
   if($('sumDays'))$('sumDays').textContent=days+' '+(days===1?'dia':'dias');
@@ -452,6 +454,7 @@ function boostDraft(){
     name:$('boostName').value.trim(),
     objective:boostObjective,
     destinationType:$('boostDestinationType').value,
+    appName:$('boostAppName').value.trim(),
     destination:$('boostDestination').value.trim(),
     region:$('boostRegion').value,
     cities:$('boostCities').value.trim(),
@@ -468,7 +471,7 @@ function boostDraft(){
 function loadBoostDraft(){
   try{
     const d=JSON.parse(localStorage.getItem('creditiBoostDraft')||'null'); if(!d)return;
-    ['postUrl','name','destination','cities','ageMin','ageMax','budget','days'].forEach(k=>{const id='boost'+k[0].toUpperCase()+k.slice(1);if($(id)&&d[k]!==undefined)$(id).value=d[k]});
+    ['postUrl','name','appName','destination','cities','ageMin','ageMax','budget','days'].forEach(k=>{const id='boost'+k[0].toUpperCase()+k.slice(1);if($(id)&&d[k]!==undefined)$(id).value=d[k]});
     if(d.destinationType&&$('boostDestinationType'))$('boostDestinationType').value=d.destinationType;
     if(d.region&&$('boostRegion'))$('boostRegion').value=d.region;
     if(d.budgetType&&$('boostBudgetType'))$('boostBudgetType').value=d.budgetType;
@@ -478,7 +481,7 @@ function loadBoostDraft(){
   updateBoostSummary();
 }
 document.querySelectorAll('#boostObjectives .choice').forEach(el=>el.addEventListener('click',()=>{document.querySelectorAll('#boostObjectives .choice').forEach(x=>x.classList.remove('active'));el.classList.add('active');boostObjective=el.dataset.value;updateBoostSummary()}));
-['boostPostUrl','boostName','boostDestinationType','boostDestination','boostRegion','boostCities','boostAgeMin','boostAgeMax','boostBudget','boostBudgetType','boostDays','boostStart'].forEach(id=>$(id)?.addEventListener('input',updateBoostSummary));
+['boostPostUrl','boostName','boostDestinationType','boostAppName','boostDestination','boostRegion','boostCities','boostAgeMin','boostAgeMax','boostBudget','boostBudgetType','boostDays','boostStart'].forEach(id=>$(id)?.addEventListener('input',updateBoostSummary));
 $('saveBoostDraft')?.addEventListener('click',()=>{localStorage.setItem('creditiBoostDraft',JSON.stringify(boostDraft()));const b=$('saveBoostDraft');const old=b.textContent;b.textContent='Rascunho salvo ✓';setTimeout(()=>b.textContent=old,1500)});
 $('continueMetaBtn')?.addEventListener('click',()=>{localStorage.setItem('creditiBoostDraft',JSON.stringify(boostDraft()));window.open('https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=1754387845224500','_blank')});
 $('managePaymentBtn')?.addEventListener('click',()=>window.open('https://business.facebook.com/billing_hub','_blank'));
