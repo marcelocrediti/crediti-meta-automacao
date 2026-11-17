@@ -51,4 +51,6 @@ $tmp=tempnam($out,'evt_');if(!$tmp){fwrite(STDERR,"temp failed
 file_put_contents($tmp,json_encode($p,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR),LOCK_EX);chmod($tmp,0600);
 if(!rename($tmp,$out.'/events.json')){fwrite(STDERR,"rename failed
 ");exit(7);}chmod($out.'/events.json',0600);
+$mirror=$home.'/ci-events.json';
+if(!copy($out.'/events.json',$mirror)){fwrite(STDERR,"mirror failed\n");exit(8);}chmod($mirror,0600);
 echo json_encode($p['counts'],JSON_UNESCAPED_UNICODE).PHP_EOL;
