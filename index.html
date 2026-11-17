@@ -322,6 +322,7 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
 <script>
 const API='https://jfguumxlxmveuszddyky.supabase.co/functions/v1/crediti-dashboard-feed';
+const TEST_MODE=new URLSearchParams(location.search).get('test')==='1';
 const $=id=>document.getElementById(id);
 const brl=cents=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format((Number(cents)||0)/100);
 const num=n=>new Intl.NumberFormat('pt-BR').format(Number(n)||0);
@@ -344,7 +345,7 @@ function platformColor(s){return ({instagram_ads:'#DF2A73',facebook_ads:'#3568D4
 async function load(){
   const month=$('monthSelect').value; $('main').classList.add('loading'); $('refreshBtn').classList.add('refreshing'); $('errorBox').style.display='none';
   try{
-    const r=await fetch(API+'?month='+encodeURIComponent(month),{cache:'no-store'});
+    const r=await fetch(API+'?month='+encodeURIComponent(month)+(TEST_MODE?'&test=1':''),{cache:'no-store'});
     if(!r.ok)throw new Error('Não foi possível carregar os dados.');
     data=await r.json(); render();
   }catch(e){$('errorBox').textContent=e.message+' Tente atualizar novamente.';$('errorBox').style.display='block'}
@@ -353,7 +354,7 @@ async function load(){
 
 function render(){
   const t=data.totals,a=data.adsTotals;
-  $('heroMonth').textContent='Competência '+monthName(data.month).toUpperCase();
+  $('heroMonth').textContent=(data.testMode?'MODO DE TESTE • ':'')+'Competência '+monthName(data.month).toUpperCase();
   $('lastUpdate').textContent=data.dataUpdatedAt?.meucrediti?new Date(data.dataUpdatedAt.meucrediti).toLocaleString('pt-BR',{timeZone:'America/Fortaleza',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'Sem atualização';
   $('kSpend').textContent=brl(a.spendCents);$('kImpressions').textContent=num(a.impressions);$('kClicks').textContent=num(a.clicks);$('kCpc').textContent=brl(a.clicks?Math.round(a.spendCents/a.clicks):0);
   $('kCustomers').textContent=num(t.customers);$('kRequests').textContent=num(t.requests);$('kSims').textContent=num(t.simulations);$('kGenerated').textContent=num(t.generatedContracts);
