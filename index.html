@@ -223,7 +223,7 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
   </section>
 
   <section class="section" id="turbinar">
-    <div class="sectionhead"><div><div class="eyebrow">Meta Ads</div><h2>Turbinar conteúdo</h2><p>Monte o impulsionamento no próprio Painel Crediti e revise tudo antes de seguir para a Meta.</p></div></div>
+    <div class="sectionhead"><div><div class="eyebrow">Meta Ads</div><h2>Turbinar conteúdo</h2><p>Gere o link rastreado da campanha e copie para usar no anúncio.</p></div></div>
 
     <div class="boostgrid" id="boostSection">
       <div>
@@ -285,27 +285,7 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
           </div>
         </div>
 
-        <div class="boostcard">
-          <h3>5. Orçamento e duração</h3>
-          <p>Controle o valor antes de publicar.</p>
-          <div class="boostgrid">
-            <div class="field"><label>Orçamento</label><input id="boostBudget" type="number" min="5" step="1" value="50"></div>
-            <div class="field"><label>Tipo</label><select id="boostBudgetType"><option value="total">Total da campanha</option><option value="daily">Por dia</option></select></div>
-          </div>
-          <div class="boostgrid">
-            <div class="field"><label>Duração em dias</label><input id="boostDays" type="number" min="1" max="30" value="5"></div>
-            <div class="field"><label>Início</label><select id="boostStart"><option>Assim que aprovado</option><option>Amanhã</option></select></div>
-          </div>
         </div>
-
-        <div class="boostcard">
-          <h3>6. Pagamento</h3>
-          <div class="paybox"><div class="ok">✓</div><div><b>Conta Meta Ads conectada</b><span>Conta 1754387845224500 • cobrança continua sendo feita pela Meta</span></div></div>
-          <div class="boostnotice">O Painel Crediti não armazena número de cartão, CVV ou dados bancários. A forma de pagamento permanece administrada pela Meta.</div>
-          <div class="boostactions"><button class="ghostbtn" id="managePaymentBtn">Gerenciar pagamento na Meta</button></div>
-        </div>
-      </div>
-
       <div>
         <div class="boostsummary">
           <h3>Revisão do impulsionamento</h3>
@@ -313,14 +293,14 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
           <div class="summaryrow"><span>Objetivo</span><b id="sumObjective">Baixar aplicativo</b></div><div class="summaryrow"><span>Produto</span><b id="sumProduct">Baixar o app meucrediti</b></div>
           <div class="summaryrow"><span>Destino</span><b id="sumDestination">Não informado</b></div><div class="summaryrow"><span>Rastreamento</span><b id="sumTracking">—</b></div>
           <div class="summaryrow"><span>Público</span><b id="sumAudience">Itapajé + região • 18 a 65 anos</b></div>
-          <div class="summaryrow"><span>Orçamento</span><b id="sumBudget">R$ 50,00 total</b></div>
-          <div class="summaryrow"><span>Duração</span><b id="sumDays">5 dias</b></div>
-          <div class="summaryrow"><span>Pagamento</span><b>Meta Ads • configurado</b></div>
+          
+          
+          
           <div class="boostactions">
-            <button class="ghostbtn" id="saveBoostDraft">Salvar rascunho</button>
-            <button class="primarybtn" id="continueMetaBtn">Continuar na Meta</button>
+            <button class="ghostbtn" id="saveBoostDraft">Salvar campanha</button>
+            <button class="primarybtn" id="copyTrackedUrl2">Copiar link rastreado</button>
           </div>
-          <div class="boostnotice" style="margin-top:16px;background:#1D2A22;border-color:#35483C;color:#DCE7DF">Nesta primeira versão, o painel monta e salva todo o impulsionamento e abre a conta correta no Gerenciador de Anúncios para a publicação final. A criação automática será ligada somente com autenticação administrativa, para ninguém conseguir gastar verba sem autorização.</div>
+          
         </div>
       </div>
     </div>
@@ -533,16 +513,15 @@ function updateBoostSummary(){
   if($('boostTrackedUrl'))$('boostTrackedUrl').value=tracked;
   const region=$('boostRegion')?.value||'';
   const min=$('boostAgeMin')?.value||18, max=$('boostAgeMax')?.value||65;
-  const budget=Number($('boostBudget')?.value||0), type=$('boostBudgetType')?.value||'total';
-  const days=Number($('boostDays')?.value||0);
+  const budget=0, type='total';
+  const days=0;
   if($('sumPost'))$('sumPost').textContent=post?post.replace(/^https?:\/\/(www\.)?/,'').slice(0,42):'Não informado';
   if($('sumObjective'))$('sumObjective').textContent=boostObjective;
   if($('sumProduct'))$('sumProduct').textContent=productLabel();
   if($('sumDestination'))$('sumDestination').textContent=(dest||tracked)?(appName+' • '+$('boostDestinationType').value):'Não informado';
   if($('sumTracking'))$('sumTracking').textContent=($('boostSource')?.selectedOptions?.[0]?.textContent||'Instagram Ads')+' • '+($('boostTrackingId')?.value||'—');
   if($('sumAudience'))$('sumAudience').textContent=region+' • '+min+' a '+max+' anos';
-  if($('sumBudget'))$('sumBudget').textContent=boostMoney(type==='daily'?budget*days:budget)+(type==='daily'?' estimado ('+boostMoney(budget)+'/dia)':' total');
-  if($('sumDays'))$('sumDays').textContent=days+' '+(days===1?'dia':'dias');
+
 }
 function boostDraft(){
   return {
@@ -560,10 +539,7 @@ function boostDraft(){
     cities:$('boostCities').value.trim(),
     ageMin:Number($('boostAgeMin').value||18),
     ageMax:Number($('boostAgeMax').value||65),
-    budget:Number($('boostBudget').value||0),
-    budgetType:$('boostBudgetType').value,
-    days:Number($('boostDays').value||1),
-    start:$('boostStart').value,
+
     adAccount:'1754387845224500',
     savedAt:new Date().toISOString()
   };
@@ -572,13 +548,11 @@ function loadBoostDraft(){
   if($('boostProduct'))$('boostProduct').value='APP';
   try{
     const d=JSON.parse(localStorage.getItem('creditiBoostDraft')||'null'); if(!d)return;
-    ['postUrl','name','appName','trackingId','destination','cities','ageMin','ageMax','budget','days'].forEach(k=>{const id='boost'+k[0].toUpperCase()+k.slice(1);if($(id)&&d[k]!==undefined)$(id).value=d[k]});
+    ['postUrl','name','appName','trackingId','destination','cities','ageMin','ageMax'].forEach(k=>{const id='boost'+k[0].toUpperCase()+k.slice(1);if($(id)&&d[k]!==undefined)$(id).value=d[k]});
     if(d.product&&$('boostProduct'))$('boostProduct').value=d.product;
     if(d.destinationType&&$('boostDestinationType'))$('boostDestinationType').value=d.destinationType;
     if(d.source&&$('boostSource'))$('boostSource').value=d.source;
     if(d.region&&$('boostRegion'))$('boostRegion').value=d.region;
-    if(d.budgetType&&$('boostBudgetType'))$('boostBudgetType').value=d.budgetType;
-    if(d.start&&$('boostStart'))$('boostStart').value=d.start;
     if(d.objective){boostObjective=d.objective;document.querySelectorAll('#boostObjectives .choice').forEach(el=>el.classList.toggle('active',el.dataset.value===d.objective))}
   }catch(e){}
   updateBoostSummary();
@@ -587,6 +561,12 @@ document.querySelectorAll('#boostObjectives .choice').forEach(el=>el.addEventLis
 ['boostPostUrl','boostName','boostDestinationType','boostProduct','boostAppName','boostSource','boostDestination','boostRegion','boostCities','boostAgeMin','boostAgeMax','boostBudget','boostBudgetType','boostDays','boostStart'].forEach(id=>$(id)?.addEventListener('input',updateBoostSummary));
 $('boostDestinationType')?.addEventListener('change',updateBoostSummary);
 $('boostProduct')?.addEventListener('change',updateBoostSummary);
+$('copyTrackedUrl2')?.addEventListener('click',async()=>{
+  const v=$('boostTrackedUrl')?.value||'';
+  if(!v)return;
+  try{await navigator.clipboard.writeText(v);const b=$('copyTrackedUrl2');const old=b.textContent;b.textContent='Link copiado ✓';setTimeout(()=>b.textContent=old,1500)}
+  catch{const t=$('boostTrackedUrl');t.focus();t.select();}
+});
 $('copyTrackedUrl')?.addEventListener('click',async()=>{
   const v=$('boostTrackedUrl')?.value||'';
   if(!v)return;
@@ -594,8 +574,6 @@ $('copyTrackedUrl')?.addEventListener('click',async()=>{
   catch{const t=$('boostTrackedUrl');t.focus();t.select();}
 });
 $('saveBoostDraft')?.addEventListener('click',()=>{localStorage.setItem('creditiBoostDraft',JSON.stringify(boostDraft()));const b=$('saveBoostDraft');const old=b.textContent;b.textContent='Rascunho salvo ✓';setTimeout(()=>b.textContent=old,1500)});
-$('continueMetaBtn')?.addEventListener('click',()=>{localStorage.setItem('creditiBoostDraft',JSON.stringify(boostDraft()));window.open('https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=1754387845224500','_blank')});
-$('managePaymentBtn')?.addEventListener('click',()=>window.open('https://business.facebook.com/billing_hub','_blank'));
 document.querySelectorAll('[data-boost-link]').forEach(a=>a.addEventListener('click',()=>setTimeout(()=>document.getElementById('turbinar')?.scrollIntoView({behavior:'smooth',block:'start'}),80)));
 ensureTrackingId();loadBoostDraft();
 
