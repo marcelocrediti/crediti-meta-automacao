@@ -179,6 +179,17 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
     <div class="platforms" id="platformGrid"></div>
   </section>
 
+  <section class="section" id="campanhas">
+    <div class="sectionhead"><div><div class="eyebrow">Atribuição</div><h2>Clientes por campanha</h2><p>Somente clientes com origem e código de campanha comprovados.</p></div></div>
+    <div class="panel tablewrap">
+      <table>
+        <thead><tr><th>Origem / campanha</th><th>Clientes</th><th>Solicitações</th><th>Simulações</th><th>Contratos</th><th>Assinados</th><th>Desembolsos</th><th>Valor</th></tr></thead>
+        <tbody id="campaignRows"></tbody>
+      </table>
+      <div id="attrNote" class="empty"></div>
+    </div>
+  </section>
+
   <section class="section" id="evolucao">
     <div class="sectionhead"><div><div class="eyebrow">Evolução</div><h2>Movimento diário</h2><p>Clientes, solicitações e simulações por dia.</p></div></div>
     <div class="panel">
@@ -305,7 +316,7 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
 <div class="footer">Crediti Soluções Financeiras • meucrediti • Painel privado de inteligência</div>
 </div>
 
-<div class="drawer" id="drawer"><div class="shade" id="shade"></div><nav class="menu"><div class="eyebrow">Painel Crediti</div><h3>Navegação</h3><a href="#resumo">Resumo</a><a href="#plataformas">Plataformas</a><a href="#evolucao">Evolução</a><a href="#funil">Jornada</a><a href="#produtos">Produtos</a><a href="#dias">Produção por dia</a><a href="#qualidade">Fontes e atribuição</a><a href="#turbinar" data-boost-link="1">Turbinar conteúdo</a></nav></div>
+<div class="drawer" id="drawer"><div class="shade" id="shade"></div><nav class="menu"><div class="eyebrow">Painel Crediti</div><h3>Navegação</h3><a href="#resumo">Resumo</a><a href="#plataformas">Plataformas</a><a href="#campanhas">Clientes por campanha</a><a href="#evolucao">Evolução</a><a href="#funil">Jornada</a><a href="#produtos">Produtos</a><a href="#dias">Produção por dia</a><a href="#qualidade">Fontes e atribuição</a><a href="#turbinar" data-boost-link="1">Turbinar conteúdo</a></nav></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
@@ -347,7 +358,7 @@ function render(){
   $('kSpend').textContent=brl(a.spendCents);$('kImpressions').textContent=num(a.impressions);$('kClicks').textContent=num(a.clicks);$('kCpc').textContent=brl(a.clicks?Math.round(a.spendCents/a.clicks):0);
   $('kCustomers').textContent=num(t.customers);$('kRequests').textContent=num(t.requests);$('kSims').textContent=num(t.simulations);$('kGenerated').textContent=num(t.generatedContracts);
   $('kSigned').textContent=num(t.signedContracts);$('kContracted').textContent=num(t.contracted);$('kDisb').textContent=num(t.disbursements);$('kDisbValue').textContent=brl(t.disbursedAmountCents);
-  renderPlatforms();renderDaily();renderFunnel();renderProducts();renderDailyTable();
+  renderPlatforms();renderCampaigns();renderDaily();renderFunnel();renderProducts();renderDailyTable();
   $('srcMeu').textContent='Última carga: '+(data.dataUpdatedAt?.meucrediti?new Date(data.dataUpdatedAt.meucrediti).toLocaleString('pt-BR',{timeZone:'America/Fortaleza'}):'sem registro')+'.';
   $('srcAds').textContent='Última atualização: '+(data.dataUpdatedAt?.ads?new Date(data.dataUpdatedAt.ads).toLocaleString('pt-BR',{timeZone:'America/Fortaleza'}):'sem registro')+'.';
 }
@@ -360,6 +371,17 @@ function renderPlatforms(){
       '<div class="pmetrics"><div class="pmetric"><b>'+num(x.impressions)+'</b><span>impressões</span></div><div class="pmetric"><b>'+num(x.clicks)+'</b><span>cliques</span></div><div class="pmetric"><b>'+brl(x.spendCents)+'</b><span>investimento</span></div><div class="pmetric"><b>'+pct(x.clicks,x.impressions)+'</b><span>CTR</span></div><div class="pmetric"><b>'+brl(cpc)+'</b><span>CPC médio</span></div><div class="pmetric"><b>'+num(x.newClients)+'</b><span>clientes atribuídos</span></div></div>'+
       '<div class="pfoot"><span>Contratos assinados: <b>'+num(x.signedContracts)+'</b></span><span>'+(x.impressions||x.clicks||x.spendCents?'fonte atualizada':'sem registros na competência')+'</span></div></article>';
   }).join('');
+}
+
+function renderCampaigns(){
+  const rows=data.campaigns||[];
+  if(!rows.length){
+    $('campaignRows').innerHTML='<tr><td colspan="8" class="empty">Nenhum cliente com campanha comprovada nesta competência ainda.</td></tr>';
+  }else{
+    $('campaignRows').innerHTML=rows.map(x=>'<tr><td><b>'+platformName(x.source)+'</b><br><span style="color:var(--muted);font-size:11px">'+String(x.campaignId).replace(/[<>]/g,'')+'</span></td><td>'+num(x.newClients)+'</td><td>'+num(x.requests)+'</td><td>'+num(x.simulations)+'</td><td>'+num(x.generatedContracts)+'</td><td>'+num(x.signedContracts)+'</td><td>'+num(x.disbursements)+'</td><td>'+brl(x.disbursedAmountCents)+'</td></tr>').join('');
+  }
+  const a=data.attribution||{};
+  $('attrNote').textContent='Clientes atribuídos a campanha: '+num(a.attributedClients||0)+' • Sem origem comprovada: '+num(a.unknownClients||0);
 }
 
 function renderDaily(){
