@@ -251,13 +251,25 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
           <h3>3. Destino</h3>
           <p>Defina para onde a pessoa deve ir depois de tocar no anúncio.</p>
           <div class="field"><label>Tipo de destino</label><select id="boostDestinationType"><option>Google Play</option><option>App Store</option><option>WhatsApp</option><option>Site Crediti</option><option>Instagram</option><option>Link personalizado</option></select></div>
-<div class="field"><label>Aplicativo</label><input id="boostAppName" type="text" value="meucrediti" placeholder="Ex.: meucrediti"></div>
+<div class="field"><label>Produto da campanha</label><select id="boostProduct">
+            <option value="CARTAO">Empréstimo no cartão</option>
+            <option value="CLT">Empréstimo CLT</option>
+            <option value="FGTS">Antecipação FGTS</option>
+            <option value="SEGURO_AUTO">Seguro Auto</option>
+            <option value="INSS">Consignado INSS</option>
+            <option value="FINANCIAMENTO">Financiamento de veículo</option>
+            <option value="REFINANCIAMENTO">Veículo em garantia</option>
+            <option value="CONTA_LUZ">Crédito na conta de luz</option>
+            <option value="OUTROS">Outro produto</option>
+          </select></div>
+          <div class="field"><label>Aplicativo</label><input id="boostAppName" type="text" value="meucrediti" placeholder="Ex.: meucrediti"></div>
           <div class="boostgrid">
             <div class="field"><label>Origem da campanha</label><select id="boostSource"><option value="instagram_ads">Instagram Ads</option><option value="facebook_ads">Facebook Ads</option><option value="google_ads">Google Ads</option><option value="youtube_ads">YouTube Ads</option></select></div>
             <div class="field"><label>Código de rastreamento</label><input id="boostTrackingId" type="text" readonly></div>
           </div>
           <div class="field"><label>Link ou destino</label><input id="boostDestination" type="url" placeholder="Cole o link final da campanha"></div>
           <div class="field"><label>Link rastreado final</label><textarea id="boostTrackedUrl" readonly placeholder="O link rastreado será montado automaticamente"></textarea></div>
+          <div class="boostactions" style="margin-top:8px"><button class="primarybtn" id="copyTrackedUrl">Copiar link rastreado</button></div>
         </div>
 
         <div class="boostcard">
@@ -296,7 +308,7 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
         <div class="boostsummary">
           <h3>Revisão do impulsionamento</h3>
           <div class="summaryrow"><span>Conteúdo</span><b id="sumPost">Não informado</b></div>
-          <div class="summaryrow"><span>Objetivo</span><b id="sumObjective">Baixar aplicativo</b></div>
+          <div class="summaryrow"><span>Objetivo</span><b id="sumObjective">Baixar aplicativo</b></div><div class="summaryrow"><span>Produto</span><b id="sumProduct">Empréstimo no cartão</b></div>
           <div class="summaryrow"><span>Destino</span><b id="sumDestination">Não informado</b></div><div class="summaryrow"><span>Rastreamento</span><b id="sumTracking">—</b></div>
           <div class="summaryrow"><span>Público</span><b id="sumAudience">Itapajé + região • 18 a 65 anos</b></div>
           <div class="summaryrow"><span>Orçamento</span><b id="sumBudget">R$ 50,00 total</b></div>
@@ -465,14 +477,20 @@ function makeTrackingId(){
   return 'ci-'+y+m+day+'-'+Math.random().toString(36).slice(2,8);
 }
 function slugCampaign(v){return String(v||'campanha-crediti').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80)||'campanha-crediti'}
+function productSlug(v){return String(v||'OUTROS').toLowerCase().replace(/[^a-z0-9_]+/g,'_')}
+function productLabel(){
+  const s=$('boostProduct'); return s?.selectedOptions?.[0]?.textContent||'Outro produto';
+}
 function ensureTrackingId(){if($('boostTrackingId')&&!$('boostTrackingId').value)$('boostTrackingId').value=makeTrackingId()}
 function buildTrackedUrl(){
   ensureTrackingId();
   const type=$('boostDestinationType')?.value||'';
   const source=$('boostSource')?.value||'instagram_ads';
-  const campaign=slugCampaign($('boostName')?.value);
-  const id=$('boostTrackingId')?.value||makeTrackingId();
-  const ref='utm_source='+encodeURIComponent(source)+'&utm_medium=paid_social&utm_campaign='+encodeURIComponent(campaign)+'&campaign_id='+encodeURIComponent(id);
+  const product=$('boostProduct')?.value||'OUTROS';
+  const baseCampaign=slugCampaign($('boostName')?.value||productLabel());
+  const campaign=productSlug(product)+'-'+baseCampaign;
+  const id=productSlug(product)+'-'+($('boostTrackingId')?.value||makeTrackingId());
+  const ref='utm_source='+encodeURIComponent(source)+'&utm_medium=paid_social&utm_campaign='+encodeURIComponent(campaign)+'&utm_content='+encodeURIComponent(product)+'&campaign_id='+encodeURIComponent(id);
   let base=$('boostDestination')?.value?.trim()||'';
   if(type==='Google Play'){
     const app=($('boostAppName')?.value||'').trim().toLowerCase();
@@ -488,6 +506,7 @@ function buildTrackedUrl(){
       u.searchParams.set('utm_source',source);
       u.searchParams.set('utm_medium','paid_social');
       u.searchParams.set('utm_campaign',campaign);
+      u.searchParams.set('utm_content',product);
       u.searchParams.set('campaign_id',id);
       return u.toString();
     }catch{}
@@ -507,6 +526,7 @@ function updateBoostSummary(){
   const days=Number($('boostDays')?.value||0);
   if($('sumPost'))$('sumPost').textContent=post?post.replace(/^https?:\/\/(www\.)?/,'').slice(0,42):'Não informado';
   if($('sumObjective'))$('sumObjective').textContent=boostObjective;
+  if($('sumProduct'))$('sumProduct').textContent=productLabel();
   if($('sumDestination'))$('sumDestination').textContent=(dest||tracked)?(appName+' • '+$('boostDestinationType').value):'Não informado';
   if($('sumTracking'))$('sumTracking').textContent=($('boostSource')?.selectedOptions?.[0]?.textContent||'Instagram Ads')+' • '+($('boostTrackingId')?.value||'—');
   if($('sumAudience'))$('sumAudience').textContent=region+' • '+min+' a '+max+' anos';
@@ -519,6 +539,7 @@ function boostDraft(){
     name:$('boostName').value.trim(),
     objective:boostObjective,
     destinationType:$('boostDestinationType').value,
+    product:$('boostProduct').value,
     appName:$('boostAppName').value.trim(),
     source:$('boostSource').value,
     trackingId:$('boostTrackingId').value,
@@ -540,6 +561,7 @@ function loadBoostDraft(){
   try{
     const d=JSON.parse(localStorage.getItem('creditiBoostDraft')||'null'); if(!d)return;
     ['postUrl','name','appName','trackingId','destination','cities','ageMin','ageMax','budget','days'].forEach(k=>{const id='boost'+k[0].toUpperCase()+k.slice(1);if($(id)&&d[k]!==undefined)$(id).value=d[k]});
+    if(d.product&&$('boostProduct'))$('boostProduct').value=d.product;
     if(d.destinationType&&$('boostDestinationType'))$('boostDestinationType').value=d.destinationType;
     if(d.source&&$('boostSource'))$('boostSource').value=d.source;
     if(d.region&&$('boostRegion'))$('boostRegion').value=d.region;
@@ -550,7 +572,13 @@ function loadBoostDraft(){
   updateBoostSummary();
 }
 document.querySelectorAll('#boostObjectives .choice').forEach(el=>el.addEventListener('click',()=>{document.querySelectorAll('#boostObjectives .choice').forEach(x=>x.classList.remove('active'));el.classList.add('active');boostObjective=el.dataset.value;updateBoostSummary()}));
-['boostPostUrl','boostName','boostDestinationType','boostAppName','boostSource','boostDestination','boostRegion','boostCities','boostAgeMin','boostAgeMax','boostBudget','boostBudgetType','boostDays','boostStart'].forEach(id=>$(id)?.addEventListener('input',updateBoostSummary));
+['boostPostUrl','boostName','boostDestinationType','boostProduct','boostAppName','boostSource','boostDestination','boostRegion','boostCities','boostAgeMin','boostAgeMax','boostBudget','boostBudgetType','boostDays','boostStart'].forEach(id=>$(id)?.addEventListener('input',updateBoostSummary));
+$('copyTrackedUrl')?.addEventListener('click',async()=>{
+  const v=$('boostTrackedUrl')?.value||'';
+  if(!v)return;
+  try{await navigator.clipboard.writeText(v);const b=$('copyTrackedUrl');const old=b.textContent;b.textContent='Link copiado ✓';setTimeout(()=>b.textContent=old,1500)}
+  catch{const t=$('boostTrackedUrl');t.focus();t.select();}
+});
 $('saveBoostDraft')?.addEventListener('click',()=>{localStorage.setItem('creditiBoostDraft',JSON.stringify(boostDraft()));const b=$('saveBoostDraft');const old=b.textContent;b.textContent='Rascunho salvo ✓';setTimeout(()=>b.textContent=old,1500)});
 $('continueMetaBtn')?.addEventListener('click',()=>{localStorage.setItem('creditiBoostDraft',JSON.stringify(boostDraft()));window.open('https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=1754387845224500','_blank')});
 $('managePaymentBtn')?.addEventListener('click',()=>window.open('https://business.facebook.com/billing_hub','_blank'));
