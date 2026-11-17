@@ -122,6 +122,26 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
 .paybox .ok{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#DCECDF;color:var(--green);font-weight:800}
 .paybox b{display:block;font-size:13px}.paybox span{display:block;color:var(--muted);font-size:11px;margin-top:3px}
 .boostnotice{background:#FFF8D0;border:1px solid #EBD56A;border-radius:17px;padding:14px 16px;font-size:12px;line-height:1.55;color:#66530A;margin-top:12px}
+.creatorauth{display:flex;align-items:center;justify-content:space-between;gap:14px;background:#EEF5F0;border:1px solid #CFE0D4;border-radius:20px;padding:16px 18px;margin-bottom:16px}
+.creatorauth b{display:block;font-size:14px}.creatorauth span{display:block;color:var(--muted);font-size:12px;margin-top:3px;line-height:1.4}
+.statuspill{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:8px 11px;font-size:11px;font-weight:800;background:#FFF2D0;color:#785E00}
+.statuspill.ok{background:#DCECDF;color:var(--green)}
+.statuspill.bad{background:#FFF0EE;color:#8C2C20}
+.creatorprogress{display:none;margin-top:14px;border-radius:15px;padding:13px 14px;background:#EEF5F0;color:var(--green);font-size:12px;font-weight:700;line-height:1.45}
+.creatorprogress.show{display:block}
+.creatorresult{display:none;margin-top:16px;background:#F7F9F7;border:1px solid var(--line);border-radius:18px;padding:16px}
+.creatorresult.show{display:block}
+.creatorresult h4{margin:0 0 10px;font:700 16px Poppins}
+.creatorresult .mini{font-size:11px;color:var(--muted);line-height:1.55;word-break:break-word}
+.creatorresult .ids{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.creatorresult .ids div{background:white;border:1px solid var(--line);border-radius:12px;padding:10px}
+.creatorresult .ids span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase}.creatorresult .ids b{display:block;margin-top:3px;font-size:12px;word-break:break-all}
+.dangerbtn{border:0;border-radius:16px;padding:14px 18px;font-weight:800;cursor:pointer;background:#8C2C20;color:#fff}
+.filepick{border:1.5px dashed #C6D2CA;border-radius:18px;padding:16px;background:#FBFCFB}
+.filepick input{padding:0;border:0;background:transparent}
+.creatorhint{font-size:11px;color:var(--muted);line-height:1.5;margin-top:7px}
+.creatorcalc{background:#FFF8D0;border:1px solid #EBD56A;border-radius:15px;padding:12px 14px;color:#66530A;font-size:12px;font-weight:700;margin-top:10px}
+.hidden{display:none!important}
 #boostSection{scroll-margin-top:90px}
 @media(max-width:700px){.boostgrid{grid-template-columns:1fr}.choicegrid{grid-template-columns:1fr}.boostactions>*{flex:1}}
 </style>
@@ -223,35 +243,27 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
   </section>
 
   <section class="section" id="turbinar">
-    <div class="sectionhead"><div><div class="eyebrow">Meta Ads</div><h2>Turbinar conteúdo</h2><p>Gere o link rastreado da campanha e copie para usar no anúncio.</p></div></div>
+    <div class="sectionhead"><div><div class="eyebrow">Meta Ads</div><h2>Criar campanha</h2><p>Crie uma campanha real do meucrediti pelo celular, sem depender do botão Turbinar ou do Meta Ads Manager.</p></div></div>
+
+    <div class="creatorauth">
+      <div><b id="creatorAuthTitle">Celular ainda não autorizado</b><span id="creatorAuthText">Autorize este aparelho uma vez para criar campanhas com segurança.</span></div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+        <span class="statuspill" id="creatorAuthPill">Não autorizado</span>
+        <button class="ghostbtn" id="authorizeCreatorBtn">Autorizar celular</button>
+      </div>
+    </div>
 
     <div class="boostgrid" id="boostSection">
       <div>
         <div class="boostcard">
-          <h3>1. Conteúdo do Instagram</h3>
-          <p>Cole o link do Reels ou publicação que deseja promover. Depois vamos evoluir para listar os conteúdos automaticamente.</p>
-          <div class="field"><label>Link do Reels ou post</label><input id="boostPostUrl" type="url" placeholder="https://www.instagram.com/reel/..." inputmode="url"></div>
-          <div class="field"><label>Nome interno da campanha</label><input id="boostName" type="text" placeholder="Ex.: Reels apresentação meucrediti"></div>
-        </div>
-
-        <div class="boostcard">
-          <h3>2. Objetivo</h3>
-          <p>Escolha o resultado principal que você quer buscar.</p>
-          <div class="choicegrid" id="boostObjectives">
-            <div class="choice active" data-value="Baixar aplicativo"><b>Baixar aplicativo</b><span>Levar direto para Google Play ou App Store</span></div>
-            <div class="choice" data-value="WhatsApp"><b>WhatsApp</b><span>Gerar conversas com a Crediti</span></div>
-            <div class="choice" data-value="Visitas ao site"><b>Visitas ao site</b><span>Levar tráfego para uma página</span></div>
-            <div class="choice" data-value="Engajamento"><b>Engajamento</b><span>Aumentar interação com o conteúdo</span></div>
-            <div class="choice" data-value="Mensagens no Instagram"><b>Mensagens no Instagram</b><span>Gerar conversas por direct</span></div>
-            <div class="choice" data-value="Visitas ao perfil"><b>Visitas ao perfil</b><span>Aumentar descoberta do perfil</span></div>
+          <h3>1. Criativo</h3>
+          <p>Escolha o vídeo no seu iPhone. O painel envia o arquivo direto para a biblioteca de anúncios da Meta.</p>
+          <div class="filepick">
+            <div class="field" style="margin:0"><label>Vídeo do anúncio</label><input id="campaignVideo" type="file" accept="video/mp4,video/quicktime,video/x-m4v,video/*"></div>
+            <div class="creatorhint" id="videoFileInfo">MP4, MOV ou M4V. Até 180 MB.</div>
           </div>
-        </div>
-
-        <div class="boostcard">
-          <h3>3. Destino</h3>
-          <p>Defina para onde a pessoa deve ir depois de tocar no anúncio.</p>
-          <div class="field"><label>Tipo de destino</label><select id="boostDestinationType"><option>Google Play</option><option>App Store</option><option>WhatsApp</option><option>Site Crediti</option><option>Instagram</option><option>Link personalizado</option></select></div>
-<div class="field"><label>Produto / finalidade da campanha</label><select id="boostProduct">
+          <div class="field"><label>Nome da campanha</label><input id="campaignName" type="text" placeholder="Ex.: meucrediti apresentação novembro"></div>
+          <div class="field"><label>Produto / finalidade</label><select id="campaignProduct">
             <option value="APP">Baixar o app meucrediti</option>
             <option value="CARTAO">Empréstimo no cartão</option>
             <option value="CLT">Empréstimo CLT</option>
@@ -261,46 +273,66 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
             <option value="FINANCIAMENTO">Financiamento de veículo</option>
             <option value="REFINANCIAMENTO">Veículo em garantia</option>
             <option value="CONTA_LUZ">Crédito na conta de luz</option>
-            <option value="OUTROS">Outro produto</option>
           </select></div>
-          <input id="boostAppName" type="hidden" value="meucrediti">
-          <div class="boostgrid">
-            <div class="field"><label>Origem da campanha</label><select id="boostSource"><option value="instagram_ads">Instagram Ads</option><option value="facebook_ads">Facebook Ads</option><option value="google_ads">Google Ads</option><option value="youtube_ads">YouTube Ads</option></select></div>
-            <div class="field"><label>Código de rastreamento</label><input id="boostTrackingId" type="text" readonly></div>
-          </div>
-          <div class="field" id="customDestinationField"><label>Link ou destino</label><input id="boostDestination" type="url" placeholder="Cole o link final da campanha"></div>
-          <div class="boostnotice" id="playAutoNote">Google Play selecionado. O Painel Crediti usa automaticamente o link oficial do meucrediti e gera o rastreamento da campanha.</div>
-          <div class="field"><label>Link rastreado final</label><textarea id="boostTrackedUrl" readonly placeholder="O link rastreado será montado automaticamente"></textarea></div>
-          <div class="boostactions" style="margin-top:8px"><button class="primarybtn" id="copyTrackedUrl">Copiar link rastreado</button></div>
         </div>
 
         <div class="boostcard">
-          <h3>4. Público</h3>
-          <p>Monte uma segmentação simples sem precisar entrar no Gerenciador de Anúncios.</p>
-          <div class="field"><label>Região</label><select id="boostRegion"><option>Itapajé + região</option><option>Ceará</option><option>Brasil</option><option>Personalizada</option></select></div>
-          <div class="field"><label>Cidades ou observação do público</label><textarea id="boostCities" placeholder="Ex.: Itapajé, Irauçuba, Tejuçuoca, Umirim e Uruburetama"></textarea></div>
-          <div class="boostgrid">
-            <div class="field"><label>Idade mínima</label><input id="boostAgeMin" type="number" min="18" max="65" value="18"></div>
-            <div class="field"><label>Idade máxima</label><input id="boostAgeMax" type="number" min="18" max="65" value="65"></div>
-          </div>
+          <h3>2. Texto do anúncio</h3>
+          <p>Esse texto aparece no anúncio criado pela Meta.</p>
+          <div class="field"><label>Texto principal</label><textarea id="campaignPrimaryText" placeholder="Conheça o meucrediti e simule seu crédito pelo celular.">Conheça o meucrediti e simule seu crédito pelo celular.</textarea></div>
+          <div class="field"><label>Título</label><input id="campaignHeadline" type="text" value="Baixe o app meucrediti" maxlength="100"></div>
         </div>
 
+        <div class="boostcard">
+          <h3>3. Orçamento e público</h3>
+          <p>A campanha é criada PAUSADA. O gasto só começa quando você tocar em Ativar campanha.</p>
+          <div class="boostgrid">
+            <div class="field"><label>Orçamento total (R$)</label><input id="campaignBudget" type="number" min="10" step="1" value="50" inputmode="decimal"></div>
+            <div class="field"><label>Duração em dias</label><input id="campaignDays" type="number" min="1" max="30" value="5" inputmode="numeric"></div>
+          </div>
+          <div class="creatorcalc" id="campaignBudgetCalc">R$ 10,00 por dia • Total R$ 50,00</div>
+          <div class="field"><label>Região</label><select id="campaignRegion">
+            <option value="local">Itapajé + região</option>
+            <option value="ceara">Ceará</option>
+            <option value="brasil">Brasil</option>
+            <option value="custom">Cidades personalizadas</option>
+          </select></div>
+          <div class="field hidden" id="customCitiesField"><label>Cidades</label><textarea id="campaignCities" placeholder="Ex.: Itapajé, Irauçuba, Tejuçuoca"></textarea></div>
+          <div class="field"><label>Onde anunciar</label><select id="campaignPlacement">
+            <option value="instagram">Somente Instagram</option>
+            <option value="meta">Instagram + Facebook</option>
+          </select></div>
+          <div class="boostnotice">Por ser um aplicativo de crédito, o painel identifica a campanha como <strong>serviços financeiros</strong> e respeita as restrições de segmentação da Meta.</div>
         </div>
+      </div>
+
       <div>
         <div class="boostsummary">
-          <h3>Revisão do impulsionamento</h3>
-          <div class="summaryrow"><span>Conteúdo</span><b id="sumPost">Não informado</b></div>
-          <div class="summaryrow"><span>Objetivo</span><b id="sumObjective">Baixar aplicativo</b></div><div class="summaryrow"><span>Produto</span><b id="sumProduct">Baixar o app meucrediti</b></div>
-          <div class="summaryrow"><span>Destino</span><b id="sumDestination">Não informado</b></div><div class="summaryrow"><span>Rastreamento</span><b id="sumTracking">—</b></div>
-          <div class="summaryrow"><span>Público</span><b id="sumAudience">Itapajé + região • 18 a 65 anos</b></div>
-          
-          
-          
+          <h3>Revisão da campanha</h3>
+          <div class="summaryrow"><span>Objetivo</span><b>Instalações do meucrediti</b></div>
+          <div class="summaryrow"><span>Destino</span><b>Google Play</b></div>
+          <div class="summaryrow"><span>Produto</span><b id="creatorSumProduct">Baixar o app meucrediti</b></div>
+          <div class="summaryrow"><span>Orçamento</span><b id="creatorSumBudget">R$ 50,00 • 5 dias</b></div>
+          <div class="summaryrow"><span>Público</span><b id="creatorSumRegion">Itapajé + região</b></div>
+          <div class="summaryrow"><span>Posicionamento</span><b id="creatorSumPlacement">Somente Instagram</b></div>
+          <div class="summaryrow"><span>Status inicial</span><b>PAUSADA</b></div>
           <div class="boostactions">
-            <button class="ghostbtn" id="saveBoostDraft">Salvar campanha</button>
-            <button class="primarybtn" id="copyTrackedUrl2">Copiar link rastreado</button>
+            <button class="primarybtn" id="createMetaCampaignBtn">Criar campanha PAUSADA</button>
           </div>
-          
+          <div class="creatorprogress" id="creatorProgress"></div>
+
+          <div class="creatorresult" id="creatorResult">
+            <h4 id="creatorResultTitle">Campanha criada</h4>
+            <div class="ids">
+              <div><span>Campanha</span><b id="resultCampaignId">—</b></div>
+              <div><span>Anúncio</span><b id="resultAdId">—</b></div>
+            </div>
+            <div class="mini" id="creatorResultText"></div>
+            <div class="boostactions">
+              <button class="primarybtn" id="activateMetaCampaignBtn">Ativar campanha</button>
+              <button class="dangerbtn hidden" id="pauseMetaCampaignBtn">Pausar campanha</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -310,7 +342,7 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
 <div class="footer">Crediti Soluções Financeiras • meucrediti • Painel privado de inteligência</div>
 </div>
 
-<div class="drawer" id="drawer"><div class="shade" id="shade"></div><nav class="menu"><div class="eyebrow">Painel Crediti</div><h3>Navegação</h3><a href="#resumo">Resumo</a><a href="#plataformas">Plataformas</a><a href="#campanhas">Clientes por campanha</a><a href="#evolucao">Evolução</a><a href="#funil">Jornada</a><a href="#produtos">Produtos</a><a href="#dias">Produção por dia</a><a href="#qualidade">Fontes e atribuição</a><a href="#turbinar" data-boost-link="1">Turbinar conteúdo</a></nav></div>
+<div class="drawer" id="drawer"><div class="shade" id="shade"></div><nav class="menu"><div class="eyebrow">Painel Crediti</div><h3>Navegação</h3><a href="#resumo">Resumo</a><a href="#plataformas">Plataformas</a><a href="#campanhas">Clientes por campanha</a><a href="#evolucao">Evolução</a><a href="#funil">Jornada</a><a href="#produtos">Produtos</a><a href="#dias">Produção por dia</a><a href="#qualidade">Fontes e atribuição</a><a href="#turbinar" data-boost-link="1">Criar campanha</a></nav></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
@@ -453,129 +485,167 @@ function pdf(){
 $('menuBtn').onclick=()=> $('drawer').classList.add('open');$('shade').onclick=()=> $('drawer').classList.remove('open');document.querySelectorAll('.menu a').forEach(a=>a.onclick=()=> $('drawer').classList.remove('open'));
 $('refreshBtn').onclick=load;$('pdfBtn').onclick=pdf;$('monthSelect').onchange=load;
 
-let boostObjective='Baixar aplicativo';
-function makeTrackingId(){
-  const d=new Date();const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
-  return 'ci-'+y+m+day+'-'+Math.random().toString(36).slice(2,8);
-}
-function slugCampaign(v){return String(v||'campanha-crediti').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80)||'campanha-crediti'}
-function productSlug(v){return String(v||'OUTROS').toLowerCase().replace(/[^a-z0-9_]+/g,'_')}
-function productLabel(){
-  const s=$('boostProduct'); return s?.selectedOptions?.[0]?.textContent||'Outro produto';
-}
-function ensureTrackingId(){if($('boostTrackingId')&&!$('boostTrackingId').value)$('boostTrackingId').value=makeTrackingId()}
-function buildTrackedUrl(){
-  ensureTrackingId();
-  const type=$('boostDestinationType')?.value||'';
-  const source=$('boostSource')?.value||'instagram_ads';
-  const product=$('boostProduct')?.value||'OUTROS';
-  const baseCampaign=slugCampaign($('boostName')?.value||productLabel());
-  const campaign=productSlug(product)+'-'+baseCampaign;
-  const id=productSlug(product)+'-'+($('boostTrackingId')?.value||makeTrackingId());
-  const ref='utm_source='+encodeURIComponent(source)+'&utm_medium=paid_social&utm_campaign='+encodeURIComponent(campaign)+'&utm_content='+encodeURIComponent(product)+'&campaign_id='+encodeURIComponent(id);
-  let base=$('boostDestination')?.value?.trim()||'';
-  if(type==='Google Play'){
-    const app=($('boostAppName')?.value||'').trim().toLowerCase();
-    if(app==='meucrediti'||!base)base='https://play.google.com/store/apps/details?id=br.com.creditisolucoes.meucrediti';
-    const u=new URL(base);
-    if(!u.searchParams.get('id')&&app==='meucrediti')u.searchParams.set('id','br.com.creditisolucoes.meucrediti');
-    u.searchParams.set('referrer',ref);
-    return u.toString();
-  }
-  if(base){
-    try{
-      const u=new URL(base);
-      u.searchParams.set('utm_source',source);
-      u.searchParams.set('utm_medium','paid_social');
-      u.searchParams.set('utm_campaign',campaign);
-      u.searchParams.set('utm_content',product);
-      u.searchParams.set('campaign_id',id);
-      return u.toString();
-    }catch{}
-  }
-  return '';
-}
-function boostMoney(v){return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(v)||0)}
-function updateDestinationUI(){
-  const type=$('boostDestinationType')?.value||'Google Play';
-  const auto=type==='Google Play';
-  const f=$('customDestinationField'), note=$('playAutoNote');
-  if(f)f.style.display=auto?'none':'flex';
-  if(note)note.style.display=auto?'block':'none';
-  if(auto&&$('boostDestination'))$('boostDestination').value='';
-}
-function updateBoostSummary(){
-  updateDestinationUI();
-  const post=$('boostPostUrl')?.value?.trim();
-  const dest=$('boostDestination')?.value?.trim();
-  const appName=$('boostAppName')?.value?.trim()||'Aplicativo';
-  const tracked=buildTrackedUrl();
-  if($('boostTrackedUrl'))$('boostTrackedUrl').value=tracked;
-  const region=$('boostRegion')?.value||'';
-  const min=$('boostAgeMin')?.value||18, max=$('boostAgeMax')?.value||65;
-  const budget=0, type='total';
-  const days=0;
-  if($('sumPost'))$('sumPost').textContent=post?post.replace(/^https?:\/\/(www\.)?/,'').slice(0,42):'Não informado';
-  if($('sumObjective'))$('sumObjective').textContent=boostObjective;
-  if($('sumProduct'))$('sumProduct').textContent=productLabel();
-  if($('sumDestination'))$('sumDestination').textContent=(dest||tracked)?(appName+' • '+$('boostDestinationType').value):'Não informado';
-  if($('sumTracking'))$('sumTracking').textContent=($('boostSource')?.selectedOptions?.[0]?.textContent||'Instagram Ads')+' • '+($('boostTrackingId')?.value||'—');
-  if($('sumAudience'))$('sumAudience').textContent=region+' • '+min+' a '+max+' anos';
+const META_CREATOR_API='https://creditisolucoes.com.br/wp-json/crediti-inteligencia/v1/meta-creator';
+let metaDeviceToken=localStorage.getItem('creditiMetaDeviceToken')||'';
+let uploadedMetaVideo=null;
+let createdMetaCampaign=null;
 
+function money(v){return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(v)||0)}
+function captureMetaDeviceToken(){
+  const raw=location.hash.startsWith('#')?location.hash.slice(1):'';
+  const p=new URLSearchParams(raw);
+  const token=p.get('meta-device');
+  if(token&&token.length>40){
+    metaDeviceToken=token;
+    localStorage.setItem('creditiMetaDeviceToken',token);
+    history.replaceState(null,'',location.pathname+location.search+'#turbinar');
+    setTimeout(()=>document.getElementById('turbinar')?.scrollIntoView({behavior:'smooth',block:'start'}),150);
+  }
 }
-function boostDraft(){
-  return {
-    postUrl:$('boostPostUrl').value.trim(),
-    name:$('boostName').value.trim(),
-    objective:boostObjective,
-    destinationType:$('boostDestinationType').value,
-    product:$('boostProduct').value,
-    appName:$('boostAppName').value.trim(),
-    source:$('boostSource').value,
-    trackingId:$('boostTrackingId').value,
-    trackedUrl:$('boostTrackedUrl').value,
-    destination:$('boostDestination').value.trim(),
-    region:$('boostRegion').value,
-    cities:$('boostCities').value.trim(),
-    ageMin:Number($('boostAgeMin').value||18),
-    ageMax:Number($('boostAgeMax').value||65),
-
-    adAccount:'1754387845224500',
-    savedAt:new Date().toISOString()
-  };
+function setCreatorAuth(ok,text){
+  const pill=$('creatorAuthPill'), title=$('creatorAuthTitle'), sub=$('creatorAuthText');
+  if(ok){
+    pill.textContent='Autorizado';pill.className='statuspill ok';
+    title.textContent='Celular autorizado';
+    sub.textContent=text||'Conexão segura com a conta de anúncios da Crediti.';
+    $('authorizeCreatorBtn').textContent='Reautorizar';
+  }else{
+    pill.textContent='Não autorizado';pill.className='statuspill bad';
+    title.textContent='Celular ainda não autorizado';
+    sub.textContent=text||'Autorize este aparelho uma vez para criar campanhas com segurança.';
+    $('authorizeCreatorBtn').textContent='Autorizar celular';
+  }
 }
-function loadBoostDraft(){
-  if($('boostProduct'))$('boostProduct').value='APP';
+async function creatorFetch(path,opts={}){
+  if(!metaDeviceToken)throw new Error('Autorize este celular primeiro.');
+  const headers=new Headers(opts.headers||{});
+  headers.set('X-Crediti-Device',metaDeviceToken);
+  if(opts.json!==undefined){headers.set('Content-Type','application/json');opts.body=JSON.stringify(opts.json)}
+  const r=await fetch(META_CREATOR_API+path,{...opts,headers});
+  let body={};try{body=await r.json()}catch{}
+  if(!r.ok)throw new Error(body?.message||'A Meta não concluiu esta etapa.');
+  return body;
+}
+async function refreshCreatorAuth(){
+  if(!metaDeviceToken){setCreatorAuth(false);return}
   try{
-    const d=JSON.parse(localStorage.getItem('creditiBoostDraft')||'null'); if(!d)return;
-    ['postUrl','name','appName','trackingId','destination','cities','ageMin','ageMax'].forEach(k=>{const id='boost'+k[0].toUpperCase()+k.slice(1);if($(id)&&d[k]!==undefined)$(id).value=d[k]});
-    if(d.product&&$('boostProduct'))$('boostProduct').value=d.product;
-    if(d.destinationType&&$('boostDestinationType'))$('boostDestinationType').value=d.destinationType;
-    if(d.source&&$('boostSource'))$('boostSource').value=d.source;
-    if(d.region&&$('boostRegion'))$('boostRegion').value=d.region;
-    if(d.objective){boostObjective=d.objective;document.querySelectorAll('#boostObjectives .choice').forEach(el=>el.classList.toggle('active',el.dataset.value===d.objective))}
-  }catch(e){}
-  updateBoostSummary();
+    const s=await creatorFetch('/status');
+    const ig=s.instagramUserId?'Instagram conectado':'identidade da Página disponível';
+    setCreatorAuth(true,(s.account?.name||'Conta Meta Crediti')+' • '+ig);
+  }catch(e){
+    localStorage.removeItem('creditiMetaDeviceToken');metaDeviceToken='';setCreatorAuth(false,'A autorização expirou. Autorize novamente.');
+  }
 }
-document.querySelectorAll('#boostObjectives .choice').forEach(el=>el.addEventListener('click',()=>{document.querySelectorAll('#boostObjectives .choice').forEach(x=>x.classList.remove('active'));el.classList.add('active');boostObjective=el.dataset.value;updateBoostSummary()}));
-['boostPostUrl','boostName','boostDestinationType','boostProduct','boostAppName','boostSource','boostDestination','boostRegion','boostCities','boostAgeMin','boostAgeMax','boostBudget','boostBudgetType','boostDays','boostStart'].forEach(id=>$(id)?.addEventListener('input',updateBoostSummary));
-$('boostDestinationType')?.addEventListener('change',updateBoostSummary);
-$('boostProduct')?.addEventListener('change',updateBoostSummary);
-$('copyTrackedUrl2')?.addEventListener('click',async()=>{
-  const v=$('boostTrackedUrl')?.value||'';
-  if(!v)return;
-  try{await navigator.clipboard.writeText(v);const b=$('copyTrackedUrl2');const old=b.textContent;b.textContent='Link copiado ✓';setTimeout(()=>b.textContent=old,1500)}
-  catch{const t=$('boostTrackedUrl');t.focus();t.select();}
+function creatorProductLabel(){return $('campaignProduct')?.selectedOptions?.[0]?.textContent||'Baixar o app meucrediti'}
+function updateCreatorSummary(){
+  const budget=Math.max(0,Number($('campaignBudget')?.value||0));
+  const days=Math.max(1,Number($('campaignDays')?.value||1));
+  const daily=budget/days;
+  $('campaignBudgetCalc').textContent=money(daily)+' por dia • Total '+money(budget);
+  $('creatorSumBudget').textContent=money(budget)+' • '+days+' dia'+(days===1?'':'s');
+  $('creatorSumProduct').textContent=creatorProductLabel();
+  $('creatorSumRegion').textContent=$('campaignRegion')?.selectedOptions?.[0]?.textContent||'Itapajé + região';
+  $('creatorSumPlacement').textContent=$('campaignPlacement')?.selectedOptions?.[0]?.textContent||'Somente Instagram';
+  $('customCitiesField').classList.toggle('hidden',$('campaignRegion')?.value!=='custom');
+}
+function progress(msg,isError=false){
+  const box=$('creatorProgress');box.textContent=msg;box.classList.add('show');
+  box.style.background=isError?'#FFF0EE':'#EEF5F0';box.style.color=isError?'#8C2C20':'#315744';
+}
+function showCreatorResult(row){
+  createdMetaCampaign=row;
+  localStorage.setItem('creditiLastMetaCampaign',JSON.stringify(row));
+  $('creatorResult').classList.add('show');
+  $('resultCampaignId').textContent=row.campaignId||'—';
+  $('resultAdId').textContent=row.adId||'—';
+  $('creatorResultTitle').textContent=row.status==='ACTIVE'?'Campanha ativa':'Campanha criada e pausada';
+  $('creatorResultText').textContent='Destino rastreado para Google Play. ID da campanha: '+(row.campaignId||'—')+'. Nenhum gasto começa enquanto estiver pausada.';
+  $('activateMetaCampaignBtn').classList.toggle('hidden',row.status==='ACTIVE');
+  $('pauseMetaCampaignBtn').classList.toggle('hidden',row.status!=='ACTIVE');
+}
+async function uploadCreatorVideo(file){
+  const fd=new FormData();fd.append('video',file,file.name||'video.mp4');
+  return creatorFetch('/upload-video',{method:'POST',body:fd});
+}
+async function createMetaCampaign(){
+  try{
+    if(!metaDeviceToken)throw new Error('Autorize este celular primeiro.');
+    const file=$('campaignVideo').files?.[0];
+    if(!file&&!uploadedMetaVideo)throw new Error('Escolha o vídeo do anúncio.');
+    const name=$('campaignName').value.trim();
+    if(!name)throw new Error('Informe o nome da campanha.');
+    const budget=Number($('campaignBudget').value||0);
+    const days=Number($('campaignDays').value||0);
+    if(budget<10)throw new Error('Informe orçamento total de pelo menos R$ 10,00.');
+    if(days<1||days>30)throw new Error('Escolha de 1 a 30 dias.');
+
+    const btn=$('createMetaCampaignBtn');btn.disabled=true;btn.textContent='Criando...';
+    if(!uploadedMetaVideo){
+      progress('1/2 Enviando o vídeo para a Meta...');
+      uploadedMetaVideo=await uploadCreatorVideo(file);
+    }
+    progress('2/2 Criando campanha, público, criativo e anúncio...');
+    const row=await creatorFetch('/create-app-campaign',{method:'POST',json:{
+      name,
+      product:$('campaignProduct').value,
+      primaryText:$('campaignPrimaryText').value.trim(),
+      headline:$('campaignHeadline').value.trim(),
+      budgetTotal:budget,
+      days,
+      region:$('campaignRegion').value,
+      cities:$('campaignCities').value.trim(),
+      placement:$('campaignPlacement').value,
+      videoId:uploadedMetaVideo.videoId,
+      thumbnail:uploadedMetaVideo.thumbnail||''
+    }});
+    progress('Campanha criada com sucesso e mantida PAUSADA.');
+    showCreatorResult(row);
+    btn.textContent='Campanha criada ✓';
+  }catch(e){
+    progress(e.message||'Não foi possível criar a campanha.',true);
+    const btn=$('createMetaCampaignBtn');btn.disabled=false;btn.textContent='Criar campanha PAUSADA';
+  }
+}
+async function changeMetaCampaignStatus(mode){
+  if(!createdMetaCampaign)return;
+  const budget=Number($('campaignBudget').value||0), days=Number($('campaignDays').value||0);
+  if(mode==='activate'){
+    const ok=confirm('Ativar esta campanha agora? A Meta poderá gastar até '+money(budget)+' durante '+days+' dia'+(days===1?'':'s')+'.');
+    if(!ok)return;
+  }
+  try{
+    progress(mode==='activate'?'Ativando campanha na Meta...':'Pausando campanha na Meta...');
+    const r=await creatorFetch('/status-change',{method:'POST',json:{
+      mode,
+      campaignId:createdMetaCampaign.campaignId,
+      adsetId:createdMetaCampaign.adsetId,
+      adId:createdMetaCampaign.adId
+    }});
+    createdMetaCampaign.status=r.status;
+    showCreatorResult(createdMetaCampaign);
+    progress(r.status==='ACTIVE'?'Campanha ATIVA na Meta.':'Campanha PAUSADA.');
+  }catch(e){progress(e.message||'Não foi possível alterar o status.',true)}
+}
+captureMetaDeviceToken();
+$('authorizeCreatorBtn')?.addEventListener('click',()=>{location.href='https://creditisolucoes.com.br/wp-admin/tools.php?page=crediti-meta-device'});
+$('campaignVideo')?.addEventListener('change',e=>{
+  uploadedMetaVideo=null;
+  const f=e.target.files?.[0];
+  $('videoFileInfo').textContent=f?(f.name+' • '+(f.size/1024/1024).toFixed(1).replace('.',',')+' MB'):'MP4, MOV ou M4V. Até 180 MB.';
 });
-$('copyTrackedUrl')?.addEventListener('click',async()=>{
-  const v=$('boostTrackedUrl')?.value||'';
-  if(!v)return;
-  try{await navigator.clipboard.writeText(v);const b=$('copyTrackedUrl');const old=b.textContent;b.textContent='Link copiado ✓';setTimeout(()=>b.textContent=old,1500)}
-  catch{const t=$('boostTrackedUrl');t.focus();t.select();}
-});
-$('saveBoostDraft')?.addEventListener('click',()=>{localStorage.setItem('creditiBoostDraft',JSON.stringify(boostDraft()));const b=$('saveBoostDraft');const old=b.textContent;b.textContent='Rascunho salvo ✓';setTimeout(()=>b.textContent=old,1500)});
+['campaignBudget','campaignDays','campaignProduct','campaignRegion','campaignPlacement'].forEach(id=>$(id)?.addEventListener('input',updateCreatorSummary));
+$('campaignRegion')?.addEventListener('change',updateCreatorSummary);
+$('campaignPlacement')?.addEventListener('change',updateCreatorSummary);
+$('createMetaCampaignBtn')?.addEventListener('click',createMetaCampaign);
+$('activateMetaCampaignBtn')?.addEventListener('click',()=>changeMetaCampaignStatus('activate'));
+$('pauseMetaCampaignBtn')?.addEventListener('click',()=>changeMetaCampaignStatus('pause'));
 document.querySelectorAll('[data-boost-link]').forEach(a=>a.addEventListener('click',()=>setTimeout(()=>document.getElementById('turbinar')?.scrollIntoView({behavior:'smooth',block:'start'}),80)));
-ensureTrackingId();loadBoostDraft();
+try{
+  const last=JSON.parse(localStorage.getItem('creditiLastMetaCampaign')||'null');
+  if(last?.campaignId&&last?.adId)showCreatorResult(last);
+}catch{}
+updateCreatorSummary();
+refreshCreatorAuth();
 
 fillMonths();load();setInterval(load,60000);
 </script>
