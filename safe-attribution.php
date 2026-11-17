@@ -11,17 +11,24 @@ $stamp=date('Ymd_His');
 copy($app,$app.'.pre-safe-attribution-'.$stamp.'.bak');
 
 $attrStart="\n   \$attrRaw=is_array(\$b['attribution']??null)?\$b['attribution']:[];";
-$attrEnd="\n   \$name=preg_replace('/\\s+/u',' ',trim((string)(\$b['name']??'')));";
+$nameMarker="\$name=preg_replace('/\\s+/u',' ',trim((string)(\$b['name']??'')));";
 if(str_contains($s,$attrStart)){
-  $a=strpos($s,$attrStart); $b=strpos($s,$attrEnd,$a);
+  $a=strpos($s,$attrStart); $b=strpos($s,$nameMarker,$a);
   if($b===false){fwrite(STDERR,"register attr end missing\n");exit(3);}
-  $s=substr($s,0,$a).$attrEnd.substr($s,$b+strlen($attrEnd));
+  $s=substr($s,0,$a)."\n   ".substr($s,$b);
 }
 
-$legalPat="/\\$this->q\\('INSERT INTO mc_legal\\(user_id,version,accepted_at\\) VALUES\\(\\?,\\?,\\?\\)'[^;]*;if\\(\\$attr\\)\\{.*?\\}\\$this->db->commit\\(\\);/s";
-$legalOrig="\$this->q('INSERT INTO mc_legal(user_id,version,accepted_at) VALUES(?,?,?)',[\$id,self::LEGAL,\$this->now()]);\$this->db->commit();";
-$s2=preg_replace($legalPat,$legalOrig,$s,1,$replaced);
-if($s2!==null && $replaced===1)$s=$s2;
+$legalStart="\$this->q('INSERT INTO mc_legal(user_id,version,accepted_at) VALUES(?,?,?)',[\$id,self::LEGAL,\$this->now()]);";
+$legalCommit="\$this->db->commit();";
+$ls=strpos($s,$legalStart);
+if($ls!==false){
+  $lc=strpos($s,$legalCommit,$ls);
+  if($lc===false){fwrite(STDERR,"legal commit missing\n");exit(4);}
+  $between=substr($s,$ls,($lc+strlen($legalCommit))-$ls);
+  if(str_contains($between,'mc_attribution')){
+    $s=substr($s,0,$ls).$legalStart.$legalCommit.substr($s,$lc+strlen($legalCommit));
+  }
+}
 
 $sessionLine="\$u=\$this->session();if(!\$u)reject(401,'Entre na sua conta.');\$profile=\$this->decrypt(\$u['data_encrypted']);\$uid=\$u['id'];";
 if(!str_contains($s,"/api/attribution/capture")){
