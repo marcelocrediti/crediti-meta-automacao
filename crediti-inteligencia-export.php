@@ -22,13 +22,13 @@ try{$db=new PDO($c['dsn'],$c['db_user'],$c['db_password'],[PDO::ATTR_ERRMODE=>PD
 ");exit(4);}
 $customers=[];$credits=[];
 $q=$db->prepare('SELECT id,created_at FROM mc_users WHERE created_at>=? ORDER BY created_at');$q->execute([$start]);
-foreach($q as$u){$uk=hash_hmac('sha256','user:'.$u['id'],$ek);$customers[]=['userKey'=>$uk,'registeredAt'=>$iso($u['created_at']),'firstSource'=>'desconhecido','trackingBasis'=>'nao_atribuido'];}
+foreach($q as$u){$uk=hash_hmac('sha256','user:'.$u['id'],$ek);$customers[]=['userKeyParts'=>str_split($uk,16),'registeredAt'=>$iso($u['created_at']),'firstSource'=>'desconhecido','trackingBasis'=>'nao_atribuido'];}
 $q=$db->prepare('SELECT id,user_id,product,snapshot_encrypted,created_at,updated_at FROM mc_live_requests WHERE created_at>=? ORDER BY created_at');$q->execute([$start]);
 foreach($q as$r){
  $uk=hash_hmac('sha256','user:'.$r['user_id'],$ek);$rk=hash_hmac('sha256','request:'.$r['id'],$ek);
  $prod=match((string)$r['product']){'CARD'=>'CARTAO','FGTS'=>'FGTS','CLT'=>'CLT',default=>'OUTROS'};
  $ca=$iso($r['created_at']);$ua=$iso($r['updated_at']);
- $add=function($type,$at,$amt=null)use(&$credits,$r,$uk,$rk,$prod,$ek){$e=['id'=>hash_hmac('sha256','event:'.$r['id'].':'.$type,$ek),'requestId'=>$rk,'userKey'=>$uk,'product'=>$prod,'eventType'=>$type,'occurredAt'=>$at];if($amt!==null&&$amt>=0)$e['amountCents']=(int)$amt;$credits[]=$e;};
+ $add=function($type,$at,$amt=null)use(&$credits,$r,$uk,$rk,$prod,$ek){$e=['idParts'=>str_split(hash_hmac('sha256','event:'.$r['id'].':'.$type,$ek),16),'requestIdParts'=>str_split($rk,16),'userKeyParts'=>str_split($uk,16),'product'=>$prod,'eventType'=>$type,'occurredAt'=>$at];if($amt!==null&&$amt>=0)$e['amountCents']=(int)$amt;$credits[]=$e;};
  $add('requested',$ca);$s=$dec($r['snapshot_encrypted']??null);if(!$s)continue;
  $stage=(string)($s['stage']??'');$status=(string)($s['summary_status']??'');$hist=is_array($s['history']??null)?$s['history']:[];
  $has=function($fn)use($hist){foreach($hist as$h)if(is_array($h)&&$fn($h))return true;return false;};
