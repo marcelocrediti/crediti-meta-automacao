@@ -492,13 +492,18 @@ let createdMetaCampaign=null;
 
 function money(v){return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(v)||0)}
 function captureMetaDeviceToken(){
-  const raw=location.hash.startsWith('#')?location.hash.slice(1):'';
-  const p=new URLSearchParams(raw);
-  const token=p.get('meta-device');
+  const q=new URLSearchParams(location.search);
+  let token=q.get('meta_device')||'';
+  if(!token){
+    const raw=location.hash.startsWith('#')?location.hash.slice(1):'';
+    token=new URLSearchParams(raw).get('meta-device')||'';
+  }
   if(token&&token.length>40){
     metaDeviceToken=token;
     localStorage.setItem('creditiMetaDeviceToken',token);
-    history.replaceState(null,'',location.pathname+location.search+'#turbinar');
+    q.delete('meta_device');
+    const clean=location.pathname+(q.toString()?'?'+q.toString():'')+'#turbinar';
+    history.replaceState(null,'',clean);
     setTimeout(()=>document.getElementById('turbinar')?.scrollIntoView({behavior:'smooth',block:'start'}),150);
   }
 }
@@ -627,7 +632,7 @@ async function changeMetaCampaignStatus(mode){
   }catch(e){progress(e.message||'Não foi possível alterar o status.',true)}
 }
 captureMetaDeviceToken();
-$('authorizeCreatorBtn')?.addEventListener('click',()=>{location.href='https://creditisolucoes.com.br/wp-admin/tools.php?page=crediti-meta-device'});
+$('authorizeCreatorBtn')?.addEventListener('click',()=>{location.href='https://creditisolucoes.com.br/wp-admin/admin-post.php?action=crediti_creator_authorize_device'});
 $('campaignVideo')?.addEventListener('change',e=>{
   uploadedMetaVideo=null;
   const f=e.target.files?.[0];
