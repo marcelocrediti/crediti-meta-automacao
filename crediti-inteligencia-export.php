@@ -20,15 +20,42 @@ $iso=function($ms)use($tz){$s=(int)floor(((int)$ms)/1000);return(new DateTimeImm
 $ht=function($s,$pred,$fallback)use($tz){foreach(($s['history']??[])as$h){if(!is_array($h)||!$pred($h))continue;$t=(string)($h['timestamp']??'');if($t==='')continue;try{return(new DateTimeImmutable($t))->setTimezone($tz)->format(DATE_ATOM);}catch(Throwable $e){}}return$fallback;};
 try{$db=new PDO($c['dsn'],$c['db_user'],$c['db_password'],[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_EMULATE_PREPARES=>false,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);}catch(Throwable $e){fwrite(STDERR,"db unavailable
 ");exit(4);}
-$customers=[];$credits=[];
+$customers=[];$credits=[];$attrs=[];
+try{
+ $aq=$db->query("SELECT user_id,first_source,method,campaign_id FROM mc_attribution");
+ foreach($aq as$a)$attrs[$a['user_id']]=[
+  'source'=>(string)($a['first_source']??'desconhecido'),
+  'method'=>(string)($a['method']??''),
+  'campaignId'=>isset($a['campaign_id'])?(string)$a['campaign_id']:null
+ ];
+}catch(Throwable $e){$attrs=[];}
 $q=$db->prepare('SELECT id,created_at FROM mc_users WHERE created_at>=? ORDER BY created_at');$q->execute([$start]);
-foreach($q as$u){$uk=hash_hmac('sha256','user:'.$u['id'],$ek);$customers[]=['userKeyParts'=>str_split($uk,16),'registeredAt'=>$iso($u['created_at']),'firstSource'=>'desconhecido','trackingBasis'=>'nao_atribuido'];}
+foreach($q as$u){
+ $uk=hash_hmac('sha256','user:'.$u['id'],$ek);
+ $a=$attrs[$u['id']]??null;
+ $source=$a['source']??'desconhecido';
+ if(!in_array($source,['instagram_ads','facebook_ads','google_ads','youtube_ads','organico','direto','desconhecido'],true))$source='desconhecido';
+ $basis=match($a['method']??''){
+  'url_utm'=>'utm_verified',
+  'play_install_referrer'=>'play_referrer_verified',
+  'app_store_campaign'=>'deep_link_verified',
+  'manual_verified'=>'deep_link_verified',
+  default=>'nao_atribuido'
+ };
+ $customers[]=[
+  'userKey'=>$uk,
+  'registeredAt'=>$iso($u['created_at']),
+  'firstSource'=>$source,
+  'firstCampaignId'=>($a&&$a['campaignId']!=='')?$a['campaignId']:null,
+  'trackingBasis'=>$basis
+ ];
+}
 $q=$db->prepare('SELECT id,user_id,product,snapshot_encrypted,created_at,updated_at FROM mc_live_requests WHERE created_at>=? ORDER BY created_at');$q->execute([$start]);
 foreach($q as$r){
  $uk=hash_hmac('sha256','user:'.$r['user_id'],$ek);$rk=hash_hmac('sha256','request:'.$r['id'],$ek);
  $prod=match((string)$r['product']){'CARD'=>'CARTAO','FGTS'=>'FGTS','CLT'=>'CLT',default=>'OUTROS'};
  $ca=$iso($r['created_at']);$ua=$iso($r['updated_at']);
- $add=function($type,$at,$amt=null)use(&$credits,$r,$uk,$rk,$prod,$ek){$e=['idParts'=>str_split(hash_hmac('sha256','event:'.$r['id'].':'.$type,$ek),16),'requestIdParts'=>str_split($rk,16),'userKeyParts'=>str_split($uk,16),'product'=>$prod,'eventType'=>$type,'occurredAt'=>$at];if($amt!==null&&$amt>=0)$e['amountCents']=(int)$amt;$credits[]=$e;};
+ $add=function($type,$at,$amt=null)use(&$credits,$r,$uk,$rk,$prod,$ek){$e=['id'=>hash_hmac('sha256','event:'.$r['id'].':'.$type,$ek),'requestId'=>$rk,'userKey'=>$uk,'product'=>$prod,'eventType'=>$type,'occurredAt'=>$at];if($amt!==null&&$amt>=0)$e['amountCents']=(int)$amt;$credits[]=$e;};
  $add('requested',$ca);$s=$dec($r['snapshot_encrypted']??null);if(!$s)continue;
  $stage=(string)($s['stage']??'');$status=(string)($s['summary_status']??'');$hist=is_array($s['history']??null)?$s['history']:[];
  $has=function($fn)use($hist){foreach($hist as$h)if(is_array($h)&&$fn($h))return true;return false;};
