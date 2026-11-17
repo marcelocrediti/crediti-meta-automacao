@@ -308,7 +308,12 @@ function pdf(){
   doc.text('MeuCrediti: '+(data.dataUpdatedAt?.meucrediti?new Date(data.dataUpdatedAt.meucrediti).toLocaleString('pt-BR',{timeZone:'America/Fortaleza'}):'sem registro'),20,122);
   doc.text('Midia: '+(data.dataUpdatedAt?.ads?new Date(data.dataUpdatedAt.ads).toLocaleString('pt-BR',{timeZone:'America/Fortaleza'}):'sem registro'),20,130);
   doc.text('Relatorio gerado: '+new Date().toLocaleString('pt-BR',{timeZone:'America/Fortaleza'}),20,138);
-  footer();doc.save('Crediti_Inteligencia_'+data.month+'.pdf');
+  footer();
+  const blob=doc.output('blob');
+  const url=URL.createObjectURL(blob);
+  const opened=window.open(url,'_blank');
+  if(!opened){ window.location.href=url; }
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
 }
 
 $('menuBtn').onclick=()=> $('drawer').classList.add('open');$('shade').onclick=()=> $('drawer').classList.remove('open');document.querySelectorAll('.menu a').forEach(a=>a.onclick=()=> $('drawer').classList.remove('open'));
