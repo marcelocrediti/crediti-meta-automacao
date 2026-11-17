@@ -251,7 +251,8 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
           <h3>3. Destino</h3>
           <p>Defina para onde a pessoa deve ir depois de tocar no anúncio.</p>
           <div class="field"><label>Tipo de destino</label><select id="boostDestinationType"><option>Google Play</option><option>App Store</option><option>WhatsApp</option><option>Site Crediti</option><option>Instagram</option><option>Link personalizado</option></select></div>
-<div class="field"><label>Produto da campanha</label><select id="boostProduct">
+<div class="field"><label>Produto / finalidade da campanha</label><select id="boostProduct">
+            <option value="APP">Baixar o app meucrediti</option>
             <option value="CARTAO">Empréstimo no cartão</option>
             <option value="CLT">Empréstimo CLT</option>
             <option value="FGTS">Antecipação FGTS</option>
@@ -262,12 +263,13 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
             <option value="CONTA_LUZ">Crédito na conta de luz</option>
             <option value="OUTROS">Outro produto</option>
           </select></div>
-          <div class="field"><label>Aplicativo</label><input id="boostAppName" type="text" value="meucrediti" placeholder="Ex.: meucrediti"></div>
+          <input id="boostAppName" type="hidden" value="meucrediti">
           <div class="boostgrid">
             <div class="field"><label>Origem da campanha</label><select id="boostSource"><option value="instagram_ads">Instagram Ads</option><option value="facebook_ads">Facebook Ads</option><option value="google_ads">Google Ads</option><option value="youtube_ads">YouTube Ads</option></select></div>
             <div class="field"><label>Código de rastreamento</label><input id="boostTrackingId" type="text" readonly></div>
           </div>
-          <div class="field"><label>Link ou destino</label><input id="boostDestination" type="url" placeholder="Cole o link final da campanha"></div>
+          <div class="field" id="customDestinationField"><label>Link ou destino</label><input id="boostDestination" type="url" placeholder="Cole o link final da campanha"></div>
+          <div class="boostnotice" id="playAutoNote">Google Play selecionado. O Painel Crediti usa automaticamente o link oficial do meucrediti e gera o rastreamento da campanha.</div>
           <div class="field"><label>Link rastreado final</label><textarea id="boostTrackedUrl" readonly placeholder="O link rastreado será montado automaticamente"></textarea></div>
           <div class="boostactions" style="margin-top:8px"><button class="primarybtn" id="copyTrackedUrl">Copiar link rastreado</button></div>
         </div>
@@ -308,7 +310,7 @@ th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07
         <div class="boostsummary">
           <h3>Revisão do impulsionamento</h3>
           <div class="summaryrow"><span>Conteúdo</span><b id="sumPost">Não informado</b></div>
-          <div class="summaryrow"><span>Objetivo</span><b id="sumObjective">Baixar aplicativo</b></div><div class="summaryrow"><span>Produto</span><b id="sumProduct">Empréstimo no cartão</b></div>
+          <div class="summaryrow"><span>Objetivo</span><b id="sumObjective">Baixar aplicativo</b></div><div class="summaryrow"><span>Produto</span><b id="sumProduct">Baixar o app meucrediti</b></div>
           <div class="summaryrow"><span>Destino</span><b id="sumDestination">Não informado</b></div><div class="summaryrow"><span>Rastreamento</span><b id="sumTracking">—</b></div>
           <div class="summaryrow"><span>Público</span><b id="sumAudience">Itapajé + região • 18 a 65 anos</b></div>
           <div class="summaryrow"><span>Orçamento</span><b id="sumBudget">R$ 50,00 total</b></div>
@@ -514,7 +516,16 @@ function buildTrackedUrl(){
   return '';
 }
 function boostMoney(v){return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(v)||0)}
+function updateDestinationUI(){
+  const type=$('boostDestinationType')?.value||'Google Play';
+  const auto=type==='Google Play';
+  const f=$('customDestinationField'), note=$('playAutoNote');
+  if(f)f.style.display=auto?'none':'flex';
+  if(note)note.style.display=auto?'block':'none';
+  if(auto&&$('boostDestination'))$('boostDestination').value='';
+}
 function updateBoostSummary(){
+  updateDestinationUI();
   const post=$('boostPostUrl')?.value?.trim();
   const dest=$('boostDestination')?.value?.trim();
   const appName=$('boostAppName')?.value?.trim()||'Aplicativo';
@@ -558,6 +569,7 @@ function boostDraft(){
   };
 }
 function loadBoostDraft(){
+  if($('boostProduct'))$('boostProduct').value='APP';
   try{
     const d=JSON.parse(localStorage.getItem('creditiBoostDraft')||'null'); if(!d)return;
     ['postUrl','name','appName','trackingId','destination','cities','ageMin','ageMax','budget','days'].forEach(k=>{const id='boost'+k[0].toUpperCase()+k.slice(1);if($(id)&&d[k]!==undefined)$(id).value=d[k]});
@@ -573,6 +585,8 @@ function loadBoostDraft(){
 }
 document.querySelectorAll('#boostObjectives .choice').forEach(el=>el.addEventListener('click',()=>{document.querySelectorAll('#boostObjectives .choice').forEach(x=>x.classList.remove('active'));el.classList.add('active');boostObjective=el.dataset.value;updateBoostSummary()}));
 ['boostPostUrl','boostName','boostDestinationType','boostProduct','boostAppName','boostSource','boostDestination','boostRegion','boostCities','boostAgeMin','boostAgeMax','boostBudget','boostBudgetType','boostDays','boostStart'].forEach(id=>$(id)?.addEventListener('input',updateBoostSummary));
+$('boostDestinationType')?.addEventListener('change',updateBoostSummary);
+$('boostProduct')?.addEventListener('change',updateBoostSummary);
 $('copyTrackedUrl')?.addEventListener('click',async()=>{
   const v=$('boostTrackedUrl')?.value||'';
   if(!v)return;
